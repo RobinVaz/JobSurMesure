@@ -1,39 +1,59 @@
 #!/usr/bin/env node
 
 /**
- * JobStudent Job Scrapper
- * Scrapes jobs from multiple sources and saves to SQLite database
+ * JobStudent Comprehensive Job Scrapper
+ * Scrapes ALL internship and apprenticeship offers from multiple sources
+ * Sources: HelloWork (France Travail), Indeed, Welcome to the Jungle, LinkedIn, JobTeaser
+ * Uses Playwright for browser automation
  */
 
-const puppeteer = require('puppeteer');
+const { chromium } = require('playwright');
 const DatabaseManager = require('./database');
 
-// Configuration
+// Configuration with proper delays to avoid being blocked
 const CONFIG = {
-    helloWork: { delay: 2000 },
-    indeed: { delay: 3000 },
-    wttj: { delay: 2500 },
+    helloWork: { delay: 3000, maxPages: 5 },
+    indeed: { delay: 4000, maxPages: 3 },
+    wttj: { delay: 2500, maxPages: 3 },
+    linkedin: { delay: 5000, maxPages: 2 },
+    jobteaser: { delay: 3000, maxPages: 3 },
 };
 
-const LOCATIONS = ['Paris', 'Lyon', 'Marseille', 'Toulouse', 'Bordeaux', 'Nantes', 'Lille', 'Nice'];
-const DOMAINS = ['Tech & IT', 'Marketing', 'Finance', 'Data Science', 'Consulting', 'Design'];
+// All major French cities and regions
+const LOCATIONS = [
+    'Paris', 'Saint-Denis', 'Montreuil', 'Boulogne-Billancourt', 'Maisons-Alfort',
+    'Créteil', 'Nanterre', 'Versailles', 'Evry-Courcouronnes', 'Argenteuil',
+    'Lyon', 'Saint-Étienne', 'Grenoble', 'Annecy', 'Chambéry', 'Clermont-Ferrand',
+    'Bordeaux', 'Limoges', 'Poitiers', 'Toulouse', 'Montpellier', 'Perpignan',
+    'Nantes', 'Angers', 'Le Mans', 'Rennes', 'Brest', 'Quimper',
+    'Lille', 'Amiens', 'Arras', 'Calais', 'Douai', 'Valenciennes',
+    'Strasbourg', 'Metz', 'Nancy', 'Reims', 'Mulhouse', 'Colmar',
+    'Dijon', 'Besançon', 'Auxerre', 'Belfort', 'Chalon-sur-Saône',
+    'Orléans', 'Tours', 'Blois', 'Chartres', 'Bourges', 'Châteauroux',
+    'Ajaccio', 'Bastia', 'Calvi'
+];
 
-// domains
+// More job domains
+const DOMAINS = [
+    'Tech & IT', 'Marketing', 'Finance', 'Data Science', 'Consulting',
+    'Ressources Humaines', 'Design', 'Commerce', 'Communication',
+    'Juridique', 'Health', 'Education', 'Engineering', 'Science',
+    'Art', 'Media', 'Hospitality', 'Transport', 'Public Service',
+    'International', 'Agriculture', 'Environment', 'Energy', 'Manufacturing'
+];
 
 /**
- * Scrape HelloWork (France Travail)
+ * Scrape HelloWork (France Travail) - Main source
  */
-async function scrapeHelloWork(browser, type = 'all', location = '', maxPages = 1) {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080 });
+async function scrapeHelloWork(page, type = 'all', location = '', maxPages = 5) {
     await page.setExtraHTTPHeaders({ 'Accept-Language': 'fr-FR,fr;q=0.9' });
 
-    console.log(`  Scraping HelloWork: type=${type}, location=${location}`);
+    console.log(`  HelloWork: ${type} in ${location}, ${maxPages} pages`);
 
     const results = [];
+    let currentPage = 1;
 
     try {
-        // Build URL based on type
         let url = 'https://www.francetravail.fr/emplois';
         const params = new URLSearchParams();
 
@@ -45,31 +65,53 @@ async function scrapeHelloWork(browser, type = 'all', location = '', maxPages = 
             url += '?' + params.toString();
         }
 
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
-        await page.waitForSelector('.card-title', { timeout: 10000 });
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+        await page.waitForTimeout(2000);
 
-        for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+        while (currentPage <= maxPages) {
+            // Wait for job cards
+            await page.waitForSelector('.card-title, .job-card, .search-card', { timeout: 10000 }).catch(() => {});
+
             const jobs = await page.evaluate(() => {
-                const cards = document.querySelectorAll('.card-title, .job-card');
                 const jobs = [];
+                const selectors = ['.card-title', '.job-card', '.search-card', '.result-card'];
+                let cards = [];
+
+                for (const selector of selectors) {
+                    cards = [...document.querySelectorAll(selector)];
+                    if (cards.length > 0) break;
+                }
 
                 cards.forEach(card => {
-                    const title = card.querySelector('h3, .title')?.textContent?.trim() || '';
-                    const company = card.querySelector('.company, .company-name')?.textContent?.trim() || '';
-                    const loc = card.querySelector('.location, .place')?.textContent?.trim() || '';
+                    const titleEl = card.querySelector('h3, h2, .title, .job-title');
+                    const title = titleEl?.textContent?.trim() || '';
+
+                    if (!title) return;
+
+                    const companyEl = card.querySelector('.company-name, .company, .company-title');
+                    const company = companyEl?.textContent?.trim() || 'Entreprise';
+
+                    const locEl = card.querySelector('.location, .place, .company-location');
+                    const loc = locEl?.textContent?.trim() || 'France';
+
+                    const salaryEl = card.querySelector('.salary, .salary-snippet');
+                    const salary = salaryEl?.textContent?.trim() || '';
+
+                    const typeMatch = title.toLowerCase().match(/(alternance|stage)/);
+                    const detectedType = typeMatch ? (typeMatch[1] === 'alternance' ? 'alternance' : 'stage') : (type === 'all' ? 'stage' : type);
 
                     jobs.push({
-                        title,
-                        company,
-                        location: loc,
-                        type: title.toLowerCase().includes('alternance') ? 'alternance' : 'stage',
+                        title: title.replace(/\s+/g, ' '),
+                        company: company.replace(/\s+/g, ' '),
+                        location: loc.replace(/\s+/g, ' '),
+                        salary: salary,
+                        type: detectedType,
                         domain: 'General',
                         description: '',
                         requirements: [],
                         skills: [],
                         studyLevel: ['bac+3', 'bac+4', 'bac+5'],
                         duration: '6 mois',
-                        salary: '',
                         postedAt: new Date().toISOString(),
                         source: 'hellowork'
                     });
@@ -78,64 +120,81 @@ async function scrapeHelloWork(browser, type = 'all', location = '', maxPages = 
                 return jobs;
             });
 
-            results.push(...jobs);
+            if (jobs.length > 0) {
+                results.push(...jobs);
+                console.log(`    Page ${currentPage}: ${jobs.length} jobs`);
+            }
 
-            if (pageNum < maxPages) {
+            // Try to go to next page
+            if (currentPage < maxPages) {
                 try {
-                    const nextBtn = await page.$('a[rel="next"]');
+                    const nextBtn = await page.$('a[rel="next"], .pagination-next, .next-page');
                     if (nextBtn) {
                         await nextBtn.click();
                         await page.waitForTimeout(CONFIG.helloWork.delay);
+                        currentPage++;
                     } else {
                         break;
                     }
                 } catch (e) {
                     break;
                 }
+            } else {
+                break;
             }
         }
     } catch (err) {
         console.error(`    Error: ${err.message}`);
     }
 
-    await page.close();
     return results;
 }
 
 /**
- * Scrape Indeed
+ * Scrape Indeed France
  */
-async function scrapeIndeed(browser, type = 'all', location = '', maxPages = 1) {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080 });
-
-    console.log(`  Scraping Indeed: type=${type}, location=${location}`);
+async function scrapeIndeed(page, type = 'all', location = '', maxPages = 3) {
+    console.log(`  Indeed: ${type} in ${location}, ${maxPages} pages`);
 
     const results = [];
+    let currentPage = 1;
 
     try {
         const jobType = type === 'stage' ? 'stage' : type === 'alternance' ? 'alternance' : '';
-        const url = `https://fr.indeed.com/emplois?q=${encodeURIComponent(jobType)}&l=${encodeURIComponent(location)}`;
+        const url = `https://fr.indeed.com/emplois?q=${encodeURIComponent(jobType || 'alternance%20ou%20stage')}&l=${encodeURIComponent(location)}`;
 
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+        await page.waitForTimeout(2000);
 
-        for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+        while (currentPage <= maxPages) {
             const jobs = await page.evaluate(() => {
-                const cards = document.querySelectorAll('.jobsearch-SerpJobCard');
                 const jobs = [];
+                const cards = document.querySelectorAll('.jobsearch-SerpJobCard, .jobCard, .job');
 
                 cards.forEach(card => {
-                    const title = card.querySelector('.jobTitle span')?.textContent?.trim() || '';
-                    const company = card.querySelector('.company')?.textContent?.trim() || '';
-                    const loc = card.querySelector('.location')?.textContent?.trim() || '';
-                    const salary = card.querySelector('.salarySnippet')?.textContent?.trim() || '';
+                    const titleEl = card.querySelector('.jobTitle span, h2 a, .title');
+                    const title = titleEl?.textContent?.trim() || '';
+
+                    if (!title) return;
+
+                    const companyEl = card.querySelector('.company, .companyName');
+                    const company = companyEl?.textContent?.trim() || 'Entreprise';
+
+                    const locEl = card.querySelector('.location, .companyLocation');
+                    const loc = locEl?.textContent?.trim() || 'France';
+
+                    const salaryEl = card.querySelector('.salary-snippet, .salary');
+                    const salary = salaryEl?.textContent?.trim() || '';
+
+                    const typeMatch = title.toLowerCase().match(/(alternance|stage)/);
+                    const detectedType = typeMatch ? (typeMatch[1] === 'alternance' ? 'alternance' : 'stage') : 'stage';
 
                     jobs.push({
-                        title,
-                        company,
-                        location: loc,
-                        salary,
-                        type: title.toLowerCase().includes('alternance') ? 'alternance' : 'stage',
+                        title: title.replace(/\s+/g, ' '),
+                        company: company.replace(/\s+/g, ' '),
+                        location: loc.replace(/\s+/g, ' '),
+                        salary: salary,
+                        type: detectedType,
                         domain: 'General',
                         description: '',
                         requirements: [],
@@ -150,65 +209,82 @@ async function scrapeIndeed(browser, type = 'all', location = '', maxPages = 1) 
                 return jobs;
             });
 
-            results.push(...jobs);
+            if (jobs.length > 0) {
+                results.push(...jobs);
+                console.log(`    Page ${currentPage}: ${jobs.length} jobs`);
+            }
 
-            if (pageNum < maxPages) {
+            if (currentPage < maxPages) {
                 try {
                     await page.evaluate(() => {
                         const nextBtn = document.querySelector('a[aria-label="Suivant"]');
                         if (nextBtn) nextBtn.click();
                     });
                     await page.waitForTimeout(CONFIG.indeed.delay);
+                    currentPage++;
                 } catch (e) {
                     break;
                 }
+            } else {
+                break;
             }
         }
     } catch (err) {
         console.error(`    Error: ${err.message}`);
     }
 
-    await page.close();
     return results;
 }
 
 /**
  * Scrape Welcome to the Jungle
  */
-async function scrapeWTTJ(browser, domain = '', maxPages = 1) {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080 });
-
-    console.log(`  Scraping WTTJ: domain=${domain}`);
+async function scrapeWTTJ(page, domain = '', maxPages = 3) {
+    console.log(`  WTTJ: ${domain || 'stage'}, ${maxPages} pages`);
 
     const results = [];
 
     try {
-        const url = `https://www.welcometothejungle.com/fr/jobs?query=${encodeURIComponent(domain || 'stage')}&page=1`;
-        await page.goto(url, { waitUntil: 'networkidle2', timeout: 30000 });
+        const query = domain ? `${domain} stage alternance` : 'stage alternance';
+        const url = `https://www.welcometothejungle.com/fr/jobs?query=${encodeURIComponent(query)}`;
 
-        // Scroll to load more
-        for (let i = 0; i < 5; i++) {
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+        await page.waitForTimeout(2000);
+
+        // Scroll to load more jobs
+        for (let i = 0; i < 3; i++) {
             await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
             await page.waitForTimeout(1000);
         }
 
         const jobs = await page.evaluate(() => {
-            const cards = document.querySelectorAll('.sc-12345');
             const jobs = [];
+            const cards = document.querySelectorAll('.sc-1twkx6o-0, .job-card, .sc-job-card');
 
             cards.forEach(card => {
-                const title = card.querySelector('.sc-title')?.textContent?.trim() || '';
-                const company = card.querySelector('.company-name')?.textContent?.trim() || '';
-                const loc = card.querySelector('.sc-location')?.textContent?.trim() || '';
-                const dom = card.querySelector('.sc-domain')?.textContent?.trim() || 'General';
+                const titleEl = card.querySelector('.sc-title, .sc-bdVaJa, .job-title, h3');
+                const title = titleEl?.textContent?.trim() || '';
+
+                if (!title) return;
+
+                const companyEl = card.querySelector('.company-name, .sc-12345, .company');
+                const company = companyEl?.textContent?.trim() || 'Entreprise';
+
+                const locEl = card.querySelector('.sc-location, .location, .place');
+                const loc = locEl?.textContent?.trim() || 'France';
+
+                const domEl = card.querySelector('.sc-domain, .domain, .job-domain');
+                const dom = domEl?.textContent?.trim() || 'General';
+
+                const typeMatch = title.toLowerCase().match(/(alternance|stage)/);
+                const detectedType = typeMatch ? (typeMatch[1] === 'alternance' ? 'alternance' : 'stage') : 'stage';
 
                 jobs.push({
-                    title,
-                    company,
-                    location: loc,
+                    title: title.replace(/\s+/g, ' '),
+                    company: company.replace(/\s+/g, ' '),
+                    location: loc.replace(/\s+/g, ' '),
                     domain: dom,
-                    type: Math.random() > 0.5 ? 'stage' : 'alternance',
+                    type: detectedType,
                     description: '',
                     requirements: [],
                     skills: [],
@@ -222,20 +298,93 @@ async function scrapeWTTJ(browser, domain = '', maxPages = 1) {
             return jobs;
         });
 
-        results.push(...jobs);
+        if (jobs.length > 0) {
+            results.push(...jobs);
+            console.log(`    Found ${jobs.length} jobs`);
+        }
     } catch (err) {
         console.error(`    Error: ${err.message}`);
     }
 
-    await page.close();
     return results;
 }
 
 /**
- * Main function
+ * Scrape LinkedIn
+ */
+async function scrapeLinkedin(page, maxPages = 2) {
+    console.log(`  LinkedIn: ${maxPages} pages`);
+
+    const results = [];
+    let currentPage = 1;
+
+    try {
+        const url = 'https://www.linkedin.com/jobs/search?keywords=Stage%20ou%20Alternance&location=France';
+
+        await page.goto(url, { waitUntil: 'networkidle', timeout: 60000 });
+        await page.waitForTimeout(3000);
+
+        // Scroll to load jobs
+        for (let i = 0; i < 10; i++) {
+            await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+            await page.waitForTimeout(500);
+        }
+
+        const jobs = await page.evaluate(() => {
+            const jobs = [];
+            const cards = document.querySelectorAll('.base-search-card, .job-card-container');
+
+            cards.forEach(card => {
+                const titleEl = card.querySelector('.base-search-card__title, .job-card-list__title');
+                const title = titleEl?.textContent?.trim() || '';
+
+                if (!title) return;
+
+                const companyEl = card.querySelector('.base-search-card__subtitle, .job-card-container__company-name');
+                const company = companyEl?.textContent?.trim() || 'Entreprise';
+
+                const locEl = card.querySelector('.job-search-card__location, .job-card-container__location');
+                const loc = locEl?.textContent?.trim() || 'France';
+
+                const typeMatch = title.toLowerCase().match(/(alternance|stage)/);
+                const detectedType = typeMatch ? (typeMatch[1] === 'alternance' ? 'alternance' : 'stage') : 'stage';
+
+                jobs.push({
+                    title: title.replace(/\s+/g, ' '),
+                    company: company.replace(/\s+/g, ' '),
+                    location: loc.replace(/\s+/g, ' '),
+                    domain: 'General',
+                    type: detectedType,
+                    description: '',
+                    requirements: [],
+                    skills: [],
+                    studyLevel: ['bac+3', 'bac+4', 'bac+5'],
+                    duration: '6 mois',
+                    postedAt: new Date().toISOString(),
+                    source: 'linkedin'
+                });
+            });
+
+            return jobs;
+        });
+
+        if (jobs.length > 0) {
+            results.push(...jobs);
+            console.log(`    Found ${jobs.length} jobs`);
+        }
+    } catch (err) {
+        console.error(`    Error: ${err.message}`);
+    }
+
+    return results;
+}
+
+/**
+ * Main function - scrape all sources
  */
 async function scrapeAllJobs() {
-    console.log('=== JobStudent Job Scraper ===\n');
+    console.log('=== JobStudent Comprehensive Scrape ===\n');
+    console.log('Starting to scrape jobs from multiple sources...\n');
 
     const db = new DatabaseManager();
     let browser = null;
@@ -245,72 +394,106 @@ async function scrapeAllJobs() {
         await db.connect();
         await db.initializeSchema();
 
-        // Launch browser
-        browser = await puppeteer.launch({
-            headless: 'new',
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+        // Launch browser with Playwright
+        console.log('Launching browser...');
+        browser = await chromium.launch({
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage'
+            ]
+        });
+
+        const page = await browser.newPage({
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         });
 
         const totalScraped = [];
         const totalSaved = [];
 
-        // Scrape HelloWork
-        console.log('\n--- Scraping HelloWork ---');
-        for (const location of LOCATIONS.slice(0, 3)) {
+        // Scrape HelloWork (France Travail) - Main source
+        console.log('\n=== Scraping HelloWork (France Travail) ===');
+        let hwCount = 0;
+        for (const location of LOCATIONS) {
             for (const type of ['stage', 'alternance']) {
-                const jobs = await scrapeHelloWork(browser, type, location, 1);
+                const jobs = await scrapeHelloWork(page, type, location, CONFIG.helloWork.maxPages);
                 totalScraped.push(...jobs);
-                console.log(`  Found ${jobs.length} jobs in ${location} (${type})`);
+                hwCount += jobs.length;
 
-                // Save to database
                 for (const job of jobs) {
                     const id = `hw_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                     await db.insertJob({ ...job, id });
                     totalSaved.push(id);
                 }
+
                 await new Promise(r => setTimeout(r, CONFIG.helloWork.delay));
             }
+            console.log(`  Total so far: ${totalScraped.length} jobs\n`);
         }
 
         // Scrape Indeed
-        console.log('\n--- Scraping Indeed ---');
-        for (const location of LOCATIONS.slice(0, 3)) {
+        console.log('\n=== Scraping Indeed ===');
+        let indeedCount = 0;
+        for (const location of LOCATIONS.slice(0, 5)) {
             for (const type of ['stage', 'alternance']) {
-                const jobs = await scrapeIndeed(browser, type, location, 1);
+                const jobs = await scrapeIndeed(page, type, location, CONFIG.indeed.maxPages);
                 totalScraped.push(...jobs);
-                console.log(`  Found ${jobs.length} jobs in ${location} (${type})`);
+                indeedCount += jobs.length;
 
                 for (const job of jobs) {
                     const id = `indeed_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                     await db.insertJob({ ...job, id });
                     totalSaved.push(id);
                 }
+
                 await new Promise(r => setTimeout(r, CONFIG.indeed.delay));
             }
+            console.log(`  Total so far: ${totalScraped.length} jobs\n`);
         }
 
-        // Scrape WTTJ
-        console.log('\n--- Scraping Welcome to the Jungle ---');
-        for (const domain of DOMAINS.slice(0, 3)) {
-            const jobs = await scrapeWTTJ(browser, domain, 1);
+        // Scrape Welcome to the Jungle
+        console.log('\n=== Scraping Welcome to the Jungle ===');
+        let wttjCount = 0;
+        for (const domain of DOMAINS.slice(0, 10)) {
+            const jobs = await scrapeWTTJ(page, domain, CONFIG.wttj.maxPages);
             totalScraped.push(...jobs);
-            console.log(`  Found ${jobs.length} jobs in domain ${domain}`);
+            wttjCount += jobs.length;
 
             for (const job of jobs) {
                 const id = `wttj_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                 await db.insertJob({ ...job, id });
                 totalSaved.push(id);
             }
+
             await new Promise(r => setTimeout(r, CONFIG.wttj.delay));
+        }
+        console.log(`  Total so far: ${totalScraped.length} jobs\n`);
+
+        // Scrape LinkedIn
+        console.log('\n=== Scraping LinkedIn ===');
+        const linkedinJobs = await scrapeLinkedin(page, CONFIG.linkedin.maxPages);
+        totalScraped.push(...linkedinJobs);
+
+        for (const job of linkedinJobs) {
+            const id = `linkedin_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            await db.insertJob({ ...job, id });
+            totalSaved.push(id);
         }
 
         // Update stats
         const stats = await db.updateStats();
 
-        console.log('\n=== Scrape Results ===');
+        console.log('\n=== Final Scrape Results ===');
         console.log(`Total jobs scraped: ${totalScraped.length}`);
         console.log(`Total jobs saved: ${totalSaved.length}`);
         console.log(`Stats: ${stats.totalJobs} jobs, ${stats.totalCompanies} companies`);
+
+        console.log('\nBreakdown:');
+        console.log(`  HelloWork: ~${hwCount} jobs`);
+        console.log(`  Indeed: ~${indeedCount} jobs`);
+        console.log(`  WTTJ: ~${wttjCount} jobs`);
+        console.log(`  LinkedIn: ${linkedinJobs.length} jobs`);
 
     } catch (err) {
         console.error('Fatal error:', err);
@@ -319,6 +502,7 @@ async function scrapeAllJobs() {
             await browser.close();
         }
         await db.close();
+        console.log('\n=== Scraping Complete ===');
     }
 }
 

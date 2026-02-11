@@ -10,7 +10,12 @@
     "create-db": "node scripts/create-db.js",
     "validate": "node scripts/validate-db.js"
   },
-  "keywords": ["jobs", "internship", "alternance", "job-search"],
+  "keywords": [
+    "jobs",
+    "internship",
+    "alternance",
+    "job-search"
+  ],
   "author": "JobStudent",
   "license": "ISC",
   "type": "commonjs",
@@ -20,6 +25,7 @@
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "playwright": "^1.58.2",
+    "puppeteer": "^24.37.2",
     "sqlite3": "^5.1.7"
   }
 }
