@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JobStudent - Trouvez votre stage ou alternance idéal</title>
+    <title>JobSurMesure - Trouvez votre stage ou alternance idéal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -33,7 +33,7 @@
                         <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
                             <i data-lucide="briefcase" class="w-6 h-6 text-white"></i>
                         </div>
-                        <span class="text-xl font-bold text-gray-900">JobStudent</span>
+                        <span class="text-xl font-bold text-gray-900">JobSurMesure</span>
                     </a>
                 </div>
                 <div class="hidden md:flex items-center gap-8">
@@ -44,9 +44,13 @@
                         <i data-lucide="briefcase" class="w-4 h-4"></i> Mes candidatures
                     </a>
                 </div>
-                <div class="hidden md:flex items-center gap-4">
+                <div class="hidden md:flex items-center gap-4" id="authLinks">
                     <a href="connexion.html" class="text-gray-600 hover:text-blue-600 font-medium">Connexion</a>
                     <a href="inscription.html" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-medium transition-colors">S'inscrire</a>
+                </div>
+                <div class="hidden md:flex items-center gap-4" id="userLinks">
+                    <span id="userDisplayName" class="text-gray-600 font-medium"></span>
+                    <a href="connexion.html" class="text-red-600 hover:text-red-700 font-medium" onclick="logout(); return false;">Déconnexion</a>
                 </div>
                 <div class="md:hidden flex items-center">
                     <button id="mobileMenuBtn" class="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
@@ -326,7 +330,7 @@
                         <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
                             <i data-lucide="briefcase" class="w-6 h-6 text-white"></i>
                         </div>
-                        <span class="text-xl font-bold text-white">JobStudent</span>
+                        <span class="text-xl font-bold text-white">JobSurMesure</span>
                     </a>
                     <p class="text-gray-400 mb-6 max-w-md">La plateforme intelligente qui connecte les étudiants avec leurs opportunités de stage et d'alternance idéales grâce à l'IA.</p>
                     <div class="flex gap-4">
@@ -360,7 +364,7 @@
                 </div>
             </div>
             <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-500 text-sm">© 2026 JobStudent. Tous droits réservés.</p>
+                <p class="text-gray-500 text-sm">© 2026 JobSurMesure. Tous droits réservés.</p>
                 <div class="flex gap-6 mt-4 md:mt-0">
                     <a href="#" class="text-gray-500 hover:text-gray-300 text-sm">Mentions légales</a>
                     <a href="#" class="text-gray-500 hover:text-gray-300 text-sm">Confidentialité</a>

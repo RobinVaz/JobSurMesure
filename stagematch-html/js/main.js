@@ -1,4 +1,4 @@
-// JobStudent - Main JavaScript
+// JobSurMesure - Main JavaScript
 
 // Popular Jobs Dataset (120+ jobs)
 const popularJobs = [
@@ -441,21 +441,50 @@ let currentUser = null;
 
 // Load user from sessionStorage
 function loadUser() {
-    const savedUser = sessionStorage.getItem('jobstudent_user');
+    const savedUser = sessionStorage.getItem('jobsurmesure_user');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
+        updateAuthUI();
     }
 }
 
 // Store user in sessionStorage
 function storeUser(user) {
-    sessionStorage.setItem('jobstudent_user', JSON.stringify(user));
+    sessionStorage.setItem('jobsurmesure_user', JSON.stringify(user));
 }
 
 // Remove user
 function removeUser() {
-    sessionStorage.removeItem('jobstudent_user');
+    sessionStorage.removeItem('jobsurmesure_user');
     currentUser = null;
+    updateAuthUI();
+}
+
+// Update UI based on auth state
+function updateAuthUI() {
+    const authLinks = document.getElementById('authLinks');
+    const userLinks = document.getElementById('userLinks');
+
+    if (currentUser) {
+        if (authLinks) authLinks.style.display = 'none';
+        if (userLinks) {
+            userLinks.style.display = 'flex';
+            document.getElementById('userDisplayName').textContent = currentUser.firstName || 'Bonjour';
+        }
+    } else {
+        if (authLinks) authLinks.style.display = 'flex';
+        if (userLinks) userLinks.style.display = 'none';
+    }
+}
+
+// Logout function
+function logout() {
+    if (currentUser && confirm('Voulez-vous vraiment vous déconnecter ?')) {
+        removeUser();
+        window.location.href = 'index.html';
+    } else if (!currentUser) {
+        window.location.href = 'connexion.html';
+    }
 }
 
 // Carousel Functions

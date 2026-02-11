@@ -1,11 +1,17 @@
-// Database Manager - SQLite for JobStudent
+// Database Manager - SQLite for JobSurMesure
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const crypto = require('crypto');
 
 class DatabaseManager {
     constructor() {
         this.dbPath = path.join(__dirname, '..', 'data', 'jobs.db');
         this.db = null;
+    }
+
+    // Generate unique ID
+    generateId(prefix) {
+        return `${prefix}_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`;
     }
 
     async connect() {
@@ -133,7 +139,7 @@ class DatabaseManager {
             `;
 
             const values = [
-                job.id,
+                job.id || this.generateId('job'),
                 job.source || 'mock',
                 job.title,
                 job.company || '',
@@ -161,6 +167,117 @@ class DatabaseManager {
                     reject(err);
                 } else {
                     resolve(this.lastID);
+                }
+            });
+        });
+    }
+
+    async insertUser(user) {
+        return new Promise((resolve, reject) => {
+            const sql = `
+                INSERT OR REPLACE INTO users (
+                    id, email, firstName, lastName, dateOfBirth, profile, createdAt
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const values = [
+                user.id || this.generateId('user'),
+                user.email,
+                user.firstName || '',
+                user.lastName || '',
+                user.dateOfBirth || '',
+                JSON.stringify(user.profile || {}),
+                user.createdAt || new Date().toISOString()
+            ];
+
+            this.db.run(sql, values, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            });
+        });
+    }
+
+    async getUserByEmail(email) {
+        return new Promise((resolve, reject) => {
+            this.db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else if (row) {
+                    resolve({
+                        ...row,
+                        profile: row.profile ? JSON.parse(row.profile) : {}
+                    });
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+    }
+
+    async getUserById(id) {
+        return new Promise((resolve, reject) => {
+            this.db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+                if (err) {
+                    reject(err);
+                } else if (row) {
+                    resolve({
+                        ...row,
+                        profile: row.profile ? JSON.parse(row.profile) : {}
+                    });
+                } else {
+                    resolve(null);
+                }
+            });
+        });
+    }
+
+    async insertApplication(application) {
+        return new Promise((resolve, reject) => {
+            const sql = `
+                INSERT INTO applications (
+                    id, jobId, userId, status, customCvUrl, customCoverLetterUrl, appliedAt, notes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+
+            const values = [
+                application.id || this.generateId('app'),
+                application.jobId,
+                application.userId,
+                application.status || 'draft',
+                application.customCvUrl || '',
+                application.customCoverLetterUrl || '',
+                application.appliedAt || new Date().toISOString(),
+                application.notes || ''
+            ];
+
+            this.db.run(sql, values, function(err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(this.lastID);
+                }
+            });
+        });
+    }
+
+    async getApplications(userId) {
+        return new Promise((resolve, reject) => {
+            let sql = `
+                SELECT a.*, j.title as jobTitle, j.company, j.companyLogo, j.domain, j.type
+                FROM applications a
+                JOIN jobs j ON a.jobId = j.id
+                WHERE a.userId = ?
+                ORDER BY a.appliedAt DESC
+            `;
+
+            this.db.all(sql, [userId], (err, rows) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(rows);
                 }
             });
         });

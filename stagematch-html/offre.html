@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Détails de l'offre - JobStudent</title>
+    <title>Détails de l'offre - JobSurMesure</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -28,7 +28,7 @@
                         <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center">
                             <i data-lucide="briefcase" class="w-6 h-6 text-white"></i>
                         </div>
-                        <span class="text-xl font-bold text-gray-900">JobStudent</span>
+                        <span class="text-xl font-bold text-gray-900">JobSurMesure</span>
                     </a>
                 </div>
                 <div class="hidden md:flex items-center gap-8">
@@ -138,6 +138,21 @@
                                 <p id="jobStudyLevel" class="text-gray-900 font-medium">Bac+3, Bac+4, Bac+5</p>
                             </div>
                         </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                                <i data-lucide="briefcase" class="w-5 h-5 text-blue-600"></i>
+                                Débouchés & Roadmap carrière
+                            </h3>
+                            <div id="jobRoadmap" class="space-y-6">
+                                <!-- Roadmap will be injected here -->
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-blue-50 rounded-xl">
+                            <h4 class="text-sm font-medium text-blue-900 mb-2">Rémunération annuelle estimée</h4>
+                            <p id="jobAnnualSalary" class="text-lg font-bold text-blue-700">Non communiqué</p>
+                        </div>
                     </div>
                 </div>
 
@@ -205,6 +220,43 @@
                         Adapter votre CV et votre lettre de motivation à l'offre peut augmenter vos chances de réussite de 50%.
                     </p>
                 </div>
+
+                <!-- AI Generation Button -->
+                <button onclick="showAIGenerationModal()" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                    Générer CV & LM avec IA
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Generation Modal -->
+        <div id="aiGenerationModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
+            <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold text-gray-900 flex items-center gap-2">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-purple-600"></i>
+                        Génération IA
+                    </h3>
+                    <button onclick="closeAIGenerationModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <p class="text-gray-600 mb-6">
+                    Notre IA va analyser votre profil et l'offre pour créer des documents sur mesure.
+                </p>
+                <div class="space-y-3">
+                    <button id="aiGenerateCv" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                        Générer CV personnalisé
+                    </button>
+                    <button id="aiGenerateLm" class="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-4 rounded-xl font-semibold transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="pen-tool" class="w-5 h-5"></i>
+                        Générer Lettre de Motivation
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-4 text-center">
+                    Les documents seront générés au format texte et téléchargeables.
+                </p>
             </div>
         </div>
     </div>
@@ -213,7 +265,7 @@
     <footer class="bg-gray-900 text-gray-300 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-                <p class="text-gray-500 text-sm">© 2026 JobStudent. Tous droits réservés.</p>
+                <p class="text-gray-500 text-sm">© 2026 JobSurMesure. Tous droits réservés.</p>
             </div>
         </div>
     </footer>

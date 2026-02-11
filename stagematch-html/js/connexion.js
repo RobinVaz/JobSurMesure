@@ -1,4 +1,4 @@
-// Login Page JavaScript
+// Login Page JavaScript - JobSurMesure
 
 // Toggle password visibility
 function togglePassword() {
@@ -71,8 +71,8 @@ function handleLogin(e) {
             }
         };
 
-        // Store user in session
-        sessionStorage.setItem('jobstudent_user', JSON.stringify(user));
+        // Store user in session with new key
+        sessionStorage.setItem('jobsurmesure_user', JSON.stringify(user));
 
         // Redirect to profile
         window.location.href = 'mon-profil.html';
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Check if user is already logged in
-    const savedUser = sessionStorage.getItem('jobstudent_user');
+    const savedUser = sessionStorage.getItem('jobsurmesure_user');
     if (savedUser) {
         window.location.href = 'mon-profil.html';
     }

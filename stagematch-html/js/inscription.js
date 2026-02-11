@@ -147,7 +147,7 @@ function handleRegistration(e) {
             dateOfBirth: formData.dateOfBirth,
             createdAt: new Date()
         };
-        sessionStorage.setItem('jobstudent_user', JSON.stringify(newUser));
+        sessionStorage.setItem('jobsurmesure_user', JSON.stringify(newUser));
 
         // Redirect to profile
         window.location.href = 'mon-profil.html';
