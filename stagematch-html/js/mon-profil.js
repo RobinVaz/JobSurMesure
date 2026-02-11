@@ -216,6 +216,8 @@ function uploadCv(event) {
             // Update UI
             const cvFileNameEl = document.getElementById('cvFileName');
             const cvFileStatusEl = document.getElementById('cvFileStatus');
+            const cvFileContainer = document.getElementById('cvFileContainer');
+            const cvPlaceholder = document.getElementById('cvPlaceholder');
 
             if (cvFileNameEl) {
                 cvFileNameEl.textContent = file.name;
@@ -224,6 +226,12 @@ function uploadCv(event) {
                 cvFileStatusEl.classList.remove('text-gray-500', 'text-red-500');
                 cvFileStatusEl.classList.add('text-green-600');
                 cvFileStatusEl.textContent = 'Uploadé le ' + new Date().toLocaleDateString('fr-FR');
+            }
+            if (cvFileContainer) {
+                cvFileContainer.classList.remove('hidden');
+            }
+            if (cvPlaceholder) {
+                cvPlaceholder.classList.add('hidden');
             }
         };
         reader.readAsDataURL(file);
@@ -256,6 +264,8 @@ function uploadLm(event) {
             // Update UI
             const lmFileNameEl = document.getElementById('lmFileName');
             const lmFileStatusEl = document.getElementById('lmFileStatus');
+            const lmFileContainer = document.getElementById('lmFileContainer');
+            const lmPlaceholder = document.getElementById('lmPlaceholder');
 
             if (lmFileNameEl) {
                 lmFileNameEl.textContent = file.name;
@@ -264,6 +274,12 @@ function uploadLm(event) {
                 lmFileStatusEl.classList.remove('text-gray-500', 'text-red-500');
                 lmFileStatusEl.classList.add('text-green-600');
                 lmFileStatusEl.textContent = 'Uploadée le ' + new Date().toLocaleDateString('fr-FR');
+            }
+            if (lmFileContainer) {
+                lmFileContainer.classList.remove('hidden');
+            }
+            if (lmPlaceholder) {
+                lmPlaceholder.classList.add('hidden');
             }
         };
         reader.readAsDataURL(file);
