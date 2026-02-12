@@ -215,6 +215,24 @@ async function loadUserProfile() {
         return;
     }
 
+    // Always restore files from localStorage first
+    const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+    if (savedFiles[cvFileKey]) {
+        currentUser.profile = currentUser.profile || {};
+        currentUser.profile.cvUrl = savedFiles[cvFileKey].url;
+        currentUser.profile.cvName = savedFiles[cvFileKey].name;
+        console.log('CV restored from localStorage:', currentUser.profile.cvName);
+    }
+    if (savedFiles[lmFileKey]) {
+        currentUser.profile = currentUser.profile || {};
+        currentUser.profile.coverLetterUrl = savedFiles[lmFileKey].url;
+        currentUser.profile.lmName = savedFiles[lmFileKey].name;
+        console.log('LM restored from localStorage:', currentUser.profile.lmName);
+    }
+
+    displayUserProfile(currentUser);
+
+    // Optional: try to sync with server (silent fail if server not available)
     try {
         const response = await fetch(`${API_URL}/users/${currentUser.id}`);
         const data = await response.json();
@@ -222,48 +240,31 @@ async function loadUserProfile() {
 
         if (data.success) {
             const user = data.user;
-            // Restore files from localStorage if not in server response
-            if (!user.profile?.cvUrl || !user.profile?.coverLetterUrl) {
-                console.log('Files not in server response, checking localStorage...');
-                const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
-                console.log('Saved files:', savedFiles);
-                console.log('cvFileKey:', cvFileKey);
-                if (savedFiles[cvFileKey] && !user.profile.cvUrl) {
-                    user.profile.cvUrl = savedFiles[cvFileKey].url;
-                    user.profile.cvName = savedFiles[cvFileKey].name;
-                    console.log('CV restored from localStorage');
-                }
-                if (savedFiles[lmFileKey] && !user.profile.coverLetterUrl) {
-                    user.profile.coverLetterUrl = savedFiles[lmFileKey].url;
-                    user.profile.lmName = savedFiles[lmFileKey].name;
-                    console.log('LM restored from localStorage');
-                }
+            // Update localStorage with server data if available
+            if (user.profile?.cvUrl && !savedFiles[cvFileKey]) {
+                console.log('CV found on server, saving to localStorage...');
+                savedFiles[cvFileKey] = {
+                    url: user.profile.cvUrl,
+                    name: user.profile.cvName || 'CV_uploadé.pdf',
+                    type: 'cv',
+                    timestamp: new Date().toISOString()
+                };
             }
-            displayUserProfile(user);
-        } else {
-            console.log('API returned success: false, using session data');
-            // Fallback to session data
-            displayUserProfile(currentUser);
+            if (user.profile?.coverLetterUrl && !savedFiles[lmFileKey]) {
+                console.log('LM found on server, saving to localStorage...');
+                savedFiles[lmFileKey] = {
+                    url: user.profile.coverLetterUrl,
+                    name: user.profile.lmName || 'LM_uploadée.pdf',
+                    type: 'lm',
+                    timestamp: new Date().toISOString()
+                };
+            }
+            if (Object.keys(savedFiles).length > 0) {
+                localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
+            }
         }
     } catch (err) {
-        console.error('Error loading profile:', err);
-        // Fallback to session data and localStorage
-        const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
-        console.log('Saved files from localStorage:', savedFiles);
-        if (savedFiles[cvFileKey]) {
-            currentUser.profile = currentUser.profile || {};
-            currentUser.profile.cvUrl = savedFiles[cvFileKey].url;
-            currentUser.profile.cvName = savedFiles[cvFileKey].name;
-            console.log('CV restored from localStorage:', currentUser.profile.cvName);
-        }
-        if (savedFiles[lmFileKey]) {
-            currentUser.profile = currentUser.profile || {};
-            currentUser.profile.coverLetterUrl = savedFiles[lmFileKey].url;
-            currentUser.profile.lmName = savedFiles[lmFileKey].name;
-            console.log('LM restored from localStorage:', currentUser.profile.lmName);
-        }
-        // Ensure displayUserProfile is called with the updated currentUser
-        displayUserProfile(currentUser);
+        console.log('Server not reachable, using local data only');
     }
 }
 
@@ -441,55 +442,53 @@ async function saveProfile() {
 
         console.log('Saving profile:', profile);
 
-        const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ profile })
-        });
+        // Update current user with new profile
+        currentUser.profile = profile;
+        localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
 
-        console.log('Response status:', response.status);
-
-        if (response.ok) {
-            alert('Profil sauvegardé avec succès !');
-            // Update current user and save to localStorage (persists across refreshes)
-            currentUser.profile = profile;
-            localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
-
-            // Save files to localStorage for persistence
-            const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
-            if (currentUser.profile.cvUrl) {
-                savedFiles[cvFileKey] = {
-                    url: currentUser.profile.cvUrl,
-                    name: currentUser.profile.cvName,
-                    type: 'cv',
-                    timestamp: new Date().toISOString()
-                };
-            }
-            if (currentUser.profile.coverLetterUrl) {
-                savedFiles[lmFileKey] = {
-                    url: currentUser.profile.coverLetterUrl,
-                    name: currentUser.profile.lmName,
-                    type: 'lm',
-                    timestamp: new Date().toISOString()
-                };
-            }
-            localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
-
-            // Update display
-            document.getElementById('userStudyLevel').textContent = `Étudiant en ${profile.studyLevel || 'Bac+3'}`;
-
-            // Reload jobs with new match scores if on search page
-            if (typeof searchJobs === 'function') {
-                searchJobs();
-            }
-        } else {
-            const errorData = await response.json().catch(() => ({}));
-            console.error('Save failed:', errorData);
-            alert(`Erreur lors de la sauvegarde: ${errorData.error || response.statusText}`);
+        // Save files to localStorage for persistence
+        const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+        if (currentUser.profile.cvUrl) {
+            savedFiles[cvFileKey] = {
+                url: currentUser.profile.cvUrl,
+                name: currentUser.profile.cvName,
+                type: 'cv',
+                timestamp: new Date().toISOString()
+            };
         }
-    } catch (err) {
-        console.error('Error saving profile:', err);
-        alert(`Erreur lors de la sauvegarde: ${err.message}`);
+        if (currentUser.profile.coverLetterUrl) {
+            savedFiles[lmFileKey] = {
+                url: currentUser.profile.coverLetterUrl,
+                name: currentUser.profile.lmName,
+                type: 'lm',
+                timestamp: new Date().toISOString()
+            };
+        }
+        localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
+
+        // Try to save to server (optional - for sync across devices)
+        try {
+            const response = await fetch(`${API_URL}/users/${currentUser.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ profile })
+            });
+            console.log('Server save response:', response.status);
+        } catch (err) {
+            // Server not available - this is expected on GitHub Pages
+            // Data is already saved to localStorage
+            console.log('Server not reachable, data saved locally only');
+        }
+
+        alert('Profil sauvegardé avec succès !');
+
+        // Update display
+        document.getElementById('userStudyLevel').textContent = `Étudiant en ${profile.studyLevel || 'Bac+3'}`;
+
+        // Reload jobs with new match scores if on search page
+        if (typeof searchJobs === 'function') {
+            searchJobs();
+        }
     } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
@@ -532,7 +531,7 @@ async function uploadCv(event) {
             console.log('CV Analysis Results:', analysis);
             console.log('Extracted skills:', newSkills);
 
-            // Store file as base64 in session storage (for immediate use)
+            // Store file as base64 in localStorage (for immediate use)
             currentUser.profile = currentUser.profile || {};
             currentUser.profile.cvUrl = fileContent.startsWith('data:') ? fileContent : null;
             currentUser.profile.cvName = file.name;
@@ -553,18 +552,7 @@ async function uploadCv(event) {
             };
             localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
 
-            // Save to server with updated skills
-            try {
-                await fetch(`${API_URL}/users/${currentUser.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ profile: currentUser.profile })
-                });
-                console.log('Profile updated with extracted skills');
-            } catch (err) {
-                console.warn('Could not save to server:', err);
-            }
-
+            // Save user to localStorage
             localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
 
             // Update UI
@@ -620,16 +608,6 @@ async function uploadCv(event) {
                 };
                 localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
 
-                try {
-                    await fetch(`${API_URL}/users/${currentUser.id}`, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ profile: currentUser.profile })
-                    });
-                } catch (err) {
-                    console.warn('Could not save to server:', err);
-                }
-
                 localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
 
                 const cvFileNameEl = document.getElementById('cvFileName');
@@ -680,17 +658,6 @@ async function uploadLm(event) {
                 timestamp: new Date().toISOString()
             };
             localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
-
-            // Save to server
-            try {
-                await fetch(`${API_URL}/users/${currentUser.id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ profile: currentUser.profile })
-                });
-            } catch (err) {
-                console.warn('Could not save to server:', err);
-            }
 
             localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
 
