@@ -492,54 +492,79 @@ function logout() {
 let currentSlide = 0;
 const slideCount = 4;
 let carouselInterval = null;
+let isAnimating = false;
 
 function updateCarousel() {
     const slides = document.querySelectorAll('#carouselSlides > div');
     slides.forEach((slide, index) => {
-        // Reset all inline styles first
-        slide.style.transition = 'all 700ms ease-in-out';
+        slide.style.transition = 'transform 0.7s ease-in-out, opacity 0.7s ease-in-out';
         slide.style.zIndex = '0';
 
         if (index === currentSlide) {
-            // Active slide
+            // Active slide - in view
             slide.style.opacity = '1';
             slide.style.transform = 'translateX(0)';
             slide.style.zIndex = '10';
-        } else {
-            // Inactive slides - positioned to the left
+        } else if (index < currentSlide) {
+            // Previous slides - hidden to the left
             slide.style.opacity = '0';
             slide.style.transform = 'translateX(-100%)';
+        } else {
+            // Next slides - hidden to the right
+            slide.style.opacity = '0';
+            slide.style.transform = 'translateX(100%)';
+        }
+    });
+
+    // Update dot indicators
+    updateDots();
+}
+
+function updateDots() {
+    const dots = document.querySelectorAll('.carousel-dot');
+    dots.forEach((dot, index) => {
+        if (index === currentSlide) {
+            dot.classList.remove('bg-white/50', 'w-3');
+            dot.classList.add('bg-white', 'w-8');
+        } else {
+            dot.classList.remove('bg-white', 'w-8');
+            dot.classList.add('bg-white/50', 'w-3');
         }
     });
 }
 
 function nextSlide() {
-    // Clear interval to prevent conflict with user interaction
+    if (isAnimating) return;
+    isAnimating = true;
+
     if (carouselInterval) {
         clearInterval(carouselInterval);
         carouselInterval = null;
     }
 
-    // Prepare next slide position before switching
     const slides = document.querySelectorAll('#carouselSlides > div');
     const nextIndex = (currentSlide + 1) % slideCount;
 
-    // Move current slide out to left
-    if (slides[currentSlide]) {
-        slides[currentSlide].style.transform = 'translateX(-100%)';
-        slides[currentSlide].style.opacity = '0';
-    }
+    // Move current slide left (out)
+    slides[currentSlide].style.transform = 'translateX(-100%)';
+    slides[currentSlide].style.opacity = '0';
+
+    // Prepare next slide from right
+    slides[nextIndex].style.transform = 'translateX(100%)';
+    slides[nextIndex].style.opacity = '0';
 
     setTimeout(() => {
         currentSlide = nextIndex;
         updateCarousel();
-        // Restart interval after transition
+        isAnimating = false;
         carouselInterval = setInterval(nextSlide, 5000);
-    }, 100);
+    }, 700);
 }
 
 function prevSlide() {
-    // Clear interval to prevent conflict with user interaction
+    if (isAnimating) return;
+    isAnimating = true;
+
     if (carouselInterval) {
         clearInterval(carouselInterval);
         carouselInterval = null;
@@ -548,21 +573,26 @@ function prevSlide() {
     const slides = document.querySelectorAll('#carouselSlides > div');
     const prevIndex = (currentSlide - 1 + slideCount) % slideCount;
 
-    if (slides[currentSlide]) {
-        slides[currentSlide].style.transform = 'translateX(-100%)';
-        slides[currentSlide].style.opacity = '0';
-    }
+    // Move current slide left (out)
+    slides[currentSlide].style.transform = 'translateX(-100%)';
+    slides[currentSlide].style.opacity = '0';
+
+    // Prepare previous slide from left
+    slides[prevIndex].style.transform = 'translateX(-100%)';
+    slides[prevIndex].style.opacity = '0';
 
     setTimeout(() => {
         currentSlide = prevIndex;
         updateCarousel();
-        // Restart interval after transition
+        isAnimating = false;
         carouselInterval = setInterval(nextSlide, 5000);
-    }, 100);
+    }, 700);
 }
 
 function goToSlide(index) {
-    // Clear interval to prevent conflict with user interaction
+    if (isAnimating) return;
+    isAnimating = true;
+
     if (carouselInterval) {
         clearInterval(carouselInterval);
         carouselInterval = null;
@@ -570,17 +600,27 @@ function goToSlide(index) {
 
     const slides = document.querySelectorAll('#carouselSlides > div');
 
-    if (slides[currentSlide]) {
-        slides[currentSlide].style.transform = 'translateX(-100%)';
-        slides[currentSlide].style.opacity = '0';
+    // Determine direction to prepare the target slide correctly
+    if (index > currentSlide || (currentSlide === slideCount - 1 && index === 0)) {
+        // Moving forward - prepare target from right
+        slides[index].style.transform = 'translateX(100%)';
+        slides[index].style.opacity = '0';
+    } else if (index < currentSlide || (currentSlide === 0 && index === slideCount - 1)) {
+        // Moving backward - prepare target from left
+        slides[index].style.transform = 'translateX(-100%)';
+        slides[index].style.opacity = '0';
     }
+
+    slides[currentSlide].style.transform = 'translateX(-100%)';
+    slides[currentSlide].style.opacity = '0';
 
     setTimeout(() => {
         currentSlide = index;
         updateCarousel();
-        // Restart interval after transition
+        isAnimating = false;
+        // Restart auto-play
         carouselInterval = setInterval(nextSlide, 5000);
-    }, 100);
+    }, 700);
 }
 
 // Autocomplete Functions
