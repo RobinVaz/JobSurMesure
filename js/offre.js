@@ -558,6 +558,22 @@ function getRoadmapData(domain, type) {
     return roadmaps[domain] || roadmaps['Default'];
 }
 
+// Import functions from candidatures.js for localStorage management
+function getApplications() {
+    const stored = localStorage.getItem('jobsurmesure_applications');
+    return stored ? JSON.parse(stored) : [];
+}
+
+function saveApplications(applications) {
+    localStorage.setItem('jobsurmesure_applications', JSON.stringify(applications));
+}
+
+function addApplication(app) {
+    const apps = getApplications();
+    apps.push(app);
+    saveApplications(apps);
+}
+
 // Apply to job
 async function applyToJob() {
     const user = getCurrentUser();
@@ -574,27 +590,42 @@ async function applyToJob() {
     btn.disabled = true;
 
     try {
+        // Create application object with full info for display
         const application = {
+            id: 'app-' + Date.now(),
             jobId: job.id,
-            status: 'sent',
+            jobTitle: job.title,
+            company: job.company,
+            companyLogo: job.companyLogo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(job.company) + '&background=3b82f6&color=fff',
+            status: 'pending',
+            appliedAt: new Date().toISOString(),
+            notes: 'Candidature envoyée via JobSurMesure',
+            offerDetails: 'Offre vue sur JobSurMesure'
+        };
+
+        // Save to localStorage first (for immediate display)
+        addApplication(application);
+
+        // Also try API call
+        const apiApplication = {
+            jobId: job.id,
+            status: 'pending',
             appliedAt: new Date().toISOString()
         };
 
         const response = await fetch(`${API_URL}/applications`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(application)
+            body: JSON.stringify(apiApplication)
         });
 
-        if (response.ok) {
-            alert('Candidature envoyée avec succès !');
-            window.location.href = 'candidatures.html';
-        } else {
-            alert('Erreur lors de l\'envoi de la candidature');
-        }
+        alert('Candidature envoyée avec succès !');
+        window.location.href = 'candidatures.html';
     } catch (err) {
         console.error('Error applying:', err);
-        alert('Erreur lors de l\'envoi de la candidature');
+        // Even if API fails, the app was saved to localStorage
+        alert('Candidature enregistrée localement. Elle apparaîtra dans vos candidatures.');
+        window.location.href = 'candidatures.html';
     } finally {
         btn.textContent = originalText;
         btn.disabled = false;

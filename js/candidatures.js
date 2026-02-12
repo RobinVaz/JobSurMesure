@@ -1,91 +1,20 @@
 // Candidatures Page JavaScript
 
-// Mock applications data
-const mockApplications = [
-    {
-        id: 'app-1',
-        jobId: 'job-1',
-        jobTitle: 'Développeur Full Stack Junior',
-        company: 'TechStartup Paris',
-        companyLogo: 'https://ui-avatars.com/api/?name=TS&background=3b82f6&color=fff',
-        status: 'pending',
-        appliedAt: new Date('2026-01-25'),
-        notes: 'Première candidature, CV envoyé'
-    },
-    {
-        id: 'app-2',
-        jobId: 'job-2',
-        jobTitle: 'Stage Marketing Digital',
-        company: 'L\'Oréal',
-        companyLogo: 'https://ui-avatars.com/api/?name=LO&background=e11d48&color=fff',
-        status: 'viewed',
-        appliedAt: new Date('2026-01-20'),
-        notes: 'CV vu par le recruteur'
-    },
-    {
-        id: 'app-3',
-        jobId: 'job-3',
-        jobTitle: 'Data Analyst Junior',
-        company: 'BNP Paribas',
-        companyLogo: 'https://ui-avatars.com/api/?name=BNP&background=00965e&color=fff',
-        status: 'interview',
-        appliedAt: new Date('2026-01-15'),
-        notes: 'Rappel pour entretien téléphonique',
-        interviewDate: new Date('2026-02-10'),
-        interviewType: 'Téléphone'
-    },
-    {
-        id: 'app-4',
-        jobId: 'job-4',
-        jobTitle: 'Stage Assistant Chef de Projet',
-        company: 'Capgemini',
-        companyLogo: 'https://ui-avatars.com/api/?name=CG&background=0070ad&color=fff',
-        status: 'accepted',
-        appliedAt: new Date('2026-01-10'),
-        notes: 'Offre d\'alternance acceptée !',
-        offerDetails: '1 100€/mois, 6 mois'
-    },
-    {
-        id: 'app-5',
-        jobId: 'job-5',
-        jobTitle: 'Développeur Mobile iOS/Android',
-        company: 'Doctolib',
-        companyLogo: 'https://ui-avatars.com/api/?name=DO&background=6366f1&color=fff',
-        status: 'rejected',
-        appliedAt: new Date('2026-01-05'),
-        notes: 'Merci mais nous avons retenu un autre candidat'
-    },
-    {
-        id: 'app-6',
-        jobId: 'job-6',
-        jobTitle: 'Stage Ressources Humaines',
-        company: 'Decathlon',
-        companyLogo: 'https://ui-avatars.com/api/?name=DE&background=0082c3&color=fff',
-        status: 'pending',
-        appliedAt: new Date('2026-02-01'),
-        notes: 'En attente de réponse'
-    },
-    {
-        id: 'app-7',
-        jobId: 'job-7',
-        jobTitle: 'Ingénieur DevOps Junior',
-        company: 'OVHcloud',
-        companyLogo: 'https://ui-avatars.com/api/?name=OVH&background=000e9c&color=fff',
-        status: 'interview',
-        appliedAt: new Date('2026-01-28'),
-        notes: 'Entretien technique prévu'
-    },
-    {
-        id: 'app-8',
-        jobId: 'job-8',
-        jobTitle: 'Stage Design UX/UI',
-        company: 'BlaBlaCar',
-        companyLogo: 'https://ui-avatars.com/api/?name=BB&background=00aff5&color=fff',
-        status: 'pending',
-        appliedAt: new Date('2026-02-05'),
-        notes: 'Portfolio envoyé'
-    }
-];
+// Functions to manage applications in localStorage
+function getApplications() {
+    const stored = localStorage.getItem('jobsurmesure_applications');
+    return stored ? JSON.parse(stored) : [];
+}
+
+function saveApplications(applications) {
+    localStorage.setItem('jobsurmesure_applications', JSON.stringify(applications));
+}
+
+function addApplication(app) {
+    const apps = getApplications();
+    apps.push(app);
+    saveApplications(apps);
+}
 
 function getStatusClass(status) {
     switch (status) {
@@ -120,8 +49,16 @@ function displayApplications(applications) {
     const emptyState = document.getElementById('emptyState');
 
     if (applications.length === 0) {
-        list.innerHTML = '';
-        emptyState.classList.remove('hidden');
+        list.innerHTML = `
+            <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+                <div class="text-6xl mb-4">💼</div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucune candidature pour l'instant</h3>
+                <p class="text-gray-600 mb-6">Commencez à postuler à des offres pour les voir apparaître ici !</p>
+                <a href="recherche.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors">
+                    <i data-lucide="search" class="inline w-4 h-4 mr-2"></i>Rechercher des offres
+                </a>
+            </div>`;
+        emptyState.classList.add('hidden');
         return;
     }
 
@@ -177,9 +114,9 @@ function filterApplications(filter) {
         clickedButton.classList.remove('bg-white', 'border-gray-200', 'text-gray-700');
     }
 
-    let filtered = mockApplications;
+    let filtered = getApplications();
     if (filter !== 'all') {
-        filtered = mockApplications.filter(app => app.status === filter);
+        filtered = filtered.filter(app => app.status === filter);
     }
 
     // Update stats
@@ -209,6 +146,7 @@ function logout() {
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
         localStorage.removeItem('jobsurmesure_user');
         localStorage.removeItem('jobsurmesure_files');
+        localStorage.removeItem('jobsurmesure_applications');
         window.location.href = 'index.html';
     }
 }
@@ -236,9 +174,10 @@ document.addEventListener('DOMContentLoaded', function() {
     lucide.createIcons();
     initMobileMenu();
 
-    // Load applications
-    updateStats(mockApplications);
-    displayApplications(mockApplications);
+    // Load applications from localStorage (empty by default)
+    const applications = getApplications();
+    updateStats(applications);
+    displayApplications(applications);
 
     // Add event listeners for filter buttons
     const filterTabs = document.getElementById('filterTabs');
