@@ -163,7 +163,7 @@ function displayApplications(applications) {
     setTimeout(() => lucide.createIcons(), 10);
 }
 
-function filterApplications(filter) {
+function filterApplications(event, filter) {
     const buttons = document.querySelectorAll('.flex.gap-2 button');
     buttons.forEach(btn => btn.classList.remove('bg-blue-600', 'text-white', 'border'));
 
@@ -197,6 +197,14 @@ function viewApplication(appId) {
 function downloadOffer(appId) {
     // In a real app, this would download an offer PDF
     alert('Téléchargement de l\'offre...');
+}
+
+function logout() {
+    if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+        localStorage.removeItem('jobsurmesure_user');
+        localStorage.removeItem('jobsurmesure_files');
+        window.location.href = 'index.html';
+    }
 }
 
 function initMobileMenu() {

@@ -4,7 +4,7 @@ const API_URL = 'http://localhost:3000/api';
 
 // Get current user from session
 function getCurrentUser() {
-    const user = sessionStorage.getItem('jobsurmesure_user');
+    const user = localStorage.getItem('jobsurmesure_user');
     if (user) {
         return JSON.parse(user);
     }
@@ -448,8 +448,37 @@ async function displayPopularJobs() {
     displayJobs(sortedJobs);
 }
 
+// Logout function
+function logout() {
+    if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+        localStorage.removeItem('jobsurmesure_user');
+        localStorage.removeItem('jobsurmesure_files');
+        window.location.href = 'index.html';
+    }
+}
+
+// Mobile menu
+function initMobileMenu() {
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    const icon = document.getElementById('mobileMenuIcon');
+
+    if (btn && menu && icon) {
+        btn.addEventListener('click', function() {
+            menu.classList.toggle('hidden');
+            if (menu.classList.contains('hidden')) {
+                icon.setAttribute('data-lucide', 'menu');
+            } else {
+                icon.setAttribute('data-lucide', 'x');
+            }
+            setTimeout(() => lucide.createIcons(), 10);
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
     lucide.createIcons();
+    initMobileMenu();
     await loadStats();
     await displayPopularJobs();
 

@@ -80,7 +80,7 @@ function getJobId() {
 
 // Get current user from session
 function getCurrentUser() {
-    const user = sessionStorage.getItem('jobsurmesure_user');
+    const user = localStorage.getItem('jobsurmesure_user');
     if (user) {
         return JSON.parse(user);
     }
@@ -395,7 +395,7 @@ function getRoadmapDataBasedOnTitle(jobTitle, domain, type) {
             { title: 'Développeur Junior', description: '2-3 ans d\'expérience', salary: '35k-45k€/an', requirements: 'Bac+4/5, Stack technique' },
             { title: 'Développeur Senior', description: '5+ ans d\'expérience - Expert technique', salary: '50k-70k€/an', requirements: 'Architecture, Bonnes pratiques' },
             { title: 'Tech Lead', description: 'Direction technique - Leader d\'équipe', salary: '65k-90k€/an', requirements: 'Leadership, Management d\'équipe' },
-            { title: 'CTO / CTO', description: 'Directeur technique - Stratégie tech', salary: '90k-150k€/an', requirements: 'Stratégie, Innovation' }
+            { title: 'CTO', description: 'Directeur technique - Stratégie tech', salary: '90k-150k€/an', requirements: 'Stratégie, Innovation' }
         ];
     }
     if ((domain === 'Tech & IT' || domain === undefined) &&
@@ -406,7 +406,7 @@ function getRoadmapDataBasedOnTitle(jobTitle, domain, type) {
             { title: 'Data Analyst', description: '2-3 ans d\'expérience', salary: '35k-45k€/an', requirements: 'Bac+4/5, Excel, SQL' },
             { title: 'Data Scientist', description: '5+ ans d\'expérience - Modélisation', salary: '50k-70k€/an', requirements: 'Machine Learning, Python' },
             { title: 'Data Lead', description: 'Direction data - Leader d\'équipe', salary: '65k-90k€/an', requirements: 'Architecture data, Strategy' },
-            { title: 'CDO / CTO', description: 'Directeur data/tech', salary: '90k-150k€/an', requirements: 'Stratégie data globale' }
+            { title: 'CDO', description: 'Directeur data/tech', salary: '90k-150k€/an', requirements: 'Stratégie data globale' }
         ];
     }
     if ((domain === 'Tech & IT' || domain === undefined) &&
@@ -428,7 +428,7 @@ function getRoadmapDataBasedOnTitle(jobTitle, domain, type) {
             { title: 'DevOps Junior', description: '2-3 ans d\'expérience', salary: '35k-45k€/an', requirements: 'Bac+4/5, Cloud AWS/Azure' },
             { title: 'DevOps Senior', description: '5+ ans d\'expérience - CI/CD', salary: '50k-70k€/an', requirements: 'Kubernetes, Terraform' },
             { title: 'Site Reliability Engineer', description: 'Expertise reliability', salary: '65k-90k€/an', requirements: 'Monitoring, Scalabilité' },
-            { title: 'CTO / CTO', description: 'Directeur technique', salary: '90k-150k€/an', requirements: 'Stratégie tech globale' }
+            { title: 'CTO', description: 'Directeur technique', salary: '90k-150k€/an', requirements: 'Stratégie tech globale' }
         ];
     }
 
@@ -697,7 +697,7 @@ function displayMatchingAnalysis(matchAnalysis) {
 // Logout function
 function logout() {
     if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
-        sessionStorage.removeItem('jobsurmesure_user');
+        localStorage.removeItem('jobsurmesure_user');
         window.location.href = 'index.html';
     }
 }
