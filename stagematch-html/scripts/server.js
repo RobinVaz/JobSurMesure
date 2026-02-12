@@ -97,7 +97,7 @@ app.post('/api/users/register', async (req, res) => {
     }
 });
 
-// POST /api/users/login - Login user
+// POST /api/users/login - Login user (or create if doesn't exist)
 app.post('/api/users/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -106,10 +106,20 @@ app.post('/api/users/login', async (req, res) => {
             return res.status(400).json({ success: false, error: 'Email et mot de passe requis' });
         }
 
-        const user = await dbManager.getUserByEmail(email);
+        let user = await dbManager.getUserByEmail(email);
 
         if (!user) {
-            return res.status(401).json({ success: false, error: 'Identifiants invalides' });
+            // Create new user if doesn't exist (for demo purposes)
+            const newUser = {
+                id: generateId('user'),
+                email,
+                firstName: email.split('@')[0],
+                lastName: 'Utilisateur',
+                dateOfBirth: '1995-01-01',
+                createdAt: new Date().toISOString()
+            };
+            await dbManager.insertUser(newUser);
+            user = newUser;
         }
 
         // For demo, any password works (in production, hash and verify)

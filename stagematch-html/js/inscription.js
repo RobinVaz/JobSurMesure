@@ -1,4 +1,5 @@
 // Registration Page JavaScript
+const API_URL = 'http://localhost:3000/api';
 
 // Password strength calculation
 function passwordStrength(password) {
@@ -110,7 +111,7 @@ function validateForm(formData) {
 }
 
 // Handle registration
-function handleRegistration(e) {
+async function handleRegistration(e) {
     e.preventDefault();
     hideError();
 
@@ -129,29 +130,55 @@ function handleRegistration(e) {
         return;
     }
 
-    // In a real app, this would make an API call
-    // For demo, we just simulate success
     const submitBtn = document.getElementById('submitBtn');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Création du compte...';
     submitBtn.disabled = true;
 
-    setTimeout(() => {
-        // Simulate successful registration
-        // Store user in session
-        const newUser = {
-            id: 'user-' + Date.now(),
-            email: formData.email,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            dateOfBirth: formData.dateOfBirth,
-            createdAt: new Date()
-        };
-        localStorage.setItem('jobsurmesure_user', JSON.stringify(newUser));
+    try {
+        // Call API to register
+        const response = await fetch(`${API_URL}/users/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
 
-        // Redirect to profile
-        window.location.href = 'mon-profil.html';
-    }, 1500);
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            // Store user in local storage
+            const user = {
+                id: data.user.id,
+                email: data.user.email,
+                firstName: data.user.firstName,
+                lastName: data.user.lastName,
+                dateOfBirth: formData.dateOfBirth,
+                createdAt: new Date(),
+                profile: {
+                    cvFiles: [],
+                    preferredLocations: [],
+                    preferredTypes: ['stage', 'alternance'],
+                    preferredDomains: [],
+                    studyLevel: 'bac+3',
+                    skills: [],
+                    languages: []
+                }
+            };
+            localStorage.setItem('jobsurmesure_user', JSON.stringify(user));
+
+            // Redirect to profile
+            window.location.href = 'mon-profil.html';
+        } else {
+            showError(data.error || 'Erreur lors de la création du compte');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    } catch (err) {
+        console.error('Registration error:', err);
+        showError('Erreur de connexion. Vérifiez votre connexion internet.');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
 // Event listeners

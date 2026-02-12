@@ -1,4 +1,5 @@
 // Login Page JavaScript - JobSurMesure
+const API_URL = 'http://localhost:3000/api';
 
 // Toggle password visibility
 function togglePassword() {
@@ -32,7 +33,7 @@ function hideError() {
 }
 
 // Handle login
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
     hideError();
 
@@ -49,34 +50,32 @@ function handleLogin(e) {
     submitBtn.textContent = 'Connexion...';
     submitBtn.disabled = true;
 
-    // In a real app, this would make an API call
-    // For demo, we just simulate success
-    setTimeout(() => {
-        // Create a mock user object
-        const user = {
-            id: 'user-' + Date.now(),
-            email: email,
-            firstName: email.split('@')[0],
-            lastName: 'Utilisateur',
-            dateOfBirth: '1995-01-01',
-            createdAt: new Date(),
-            profile: {
-                cvFiles: [],
-                preferredLocations: [],
-                preferredTypes: ['stage', 'alternance'],
-                preferredDomains: [],
-                studyLevel: 'bac+3',
-                skills: [],
-                languages: []
-            }
-        };
+    try {
+        // Call API to login
+        const response = await fetch(`${API_URL}/users/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
 
-        // Store user in local storage with new key (persists across refreshes)
-        localStorage.setItem('jobsurmesure_user', JSON.stringify(user));
+        const data = await response.json();
 
-        // Redirect to profile
-        window.location.href = 'mon-profil.html';
-    }, 1500);
+        if (response.ok && data.success) {
+            // Store user in local storage with new key (persists across refreshes)
+            localStorage.setItem('jobsurmesure_user', JSON.stringify(data.user));
+            // Redirect to profile
+            window.location.href = 'mon-profil.html';
+        } else {
+            showError(data.error || 'Erreur de connexion');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        }
+    } catch (err) {
+        console.error('Login error:', err);
+        showError('Erreur de connexion. Vérifiez votre connexion internet.');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }
 }
 
 // Event listeners
