@@ -386,9 +386,15 @@ function previewCv() {
         cvModalFilename.textContent = cvName;
     }
 
-    // Use Google Docs Viewer to display both PDF and Word documents
-    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(cvUrl)}&embedded=true`;
-    document.getElementById('cvPreviewFrame').src = viewerUrl;
+    // Check if it's a Word document
+    if (cvName.toLowerCase().endsWith('.doc') || cvName.toLowerCase().endsWith('.docx')) {
+        // Use Microsoft Word Viewer for Word documents
+        const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(cvUrl)}`;
+        document.getElementById('cvPreviewFrame').src = viewerUrl;
+    } else {
+        // For PDF, display directly
+        document.getElementById('cvPreviewFrame').src = cvUrl;
+    }
     document.getElementById('cvModal').classList.remove('hidden');
 }
 
@@ -419,9 +425,15 @@ function previewLm() {
         cvModalFilename.textContent = lmName;
     }
 
-    // Use Google Docs Viewer to display both PDF and Word documents
-    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(lmUrl)}&embedded=true`;
-    document.getElementById('cvPreviewFrame').src = viewerUrl;
+    // Check if it's a Word document
+    if (lmName.toLowerCase().endsWith('.doc') || lmName.toLowerCase().endsWith('.docx')) {
+        // Use Microsoft Word Viewer for Word documents
+        const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(lmUrl)}`;
+        document.getElementById('cvPreviewFrame').src = viewerUrl;
+    } else {
+        // For PDF, display directly
+        document.getElementById('cvPreviewFrame').src = lmUrl;
+    }
     document.getElementById('cvModal').classList.remove('hidden');
 }
 
