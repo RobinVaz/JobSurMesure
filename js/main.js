@@ -514,7 +514,8 @@ function updateCarousel() {
     // Show only the active slide
     const currentSlideEl = slides[currentSlide];
     currentSlideEl.style.display = 'flex';
-    currentSlideEl.style.transform = 'none';
+    currentSlideEl.style.left = '0';
+    currentSlideEl.style.right = '0';
 
     // Update dot indicators
     updateDots();
@@ -550,17 +551,20 @@ function nextSlide() {
     const slides = document.querySelectorAll('#carouselContainer > div');
     const nextIndex = (currentSlide + 1) % slideCount;
 
-    // Position next slide at right edge
-    slides[nextIndex].style.transform = 'translateX(100vw)';
+    // Position next slide to the right (off screen)
+    slides[nextIndex].style.left = '100vw';
+    slides[nextIndex].style.right = 'auto';
     slides[nextIndex].style.display = 'flex';
 
-    // Keep current slide visible, move it to left
-    slides[currentSlide].style.transform = 'translateX(-100vw)';
-    slides[currentSlide].style.transition = 'transform 0.7s ease-in-out';
+    // Position current slide to the left (off screen)
+    slides[currentSlide].style.left = '-100vw';
+    slides[currentSlide].style.right = 'auto';
+    slides[currentSlide].style.transition = 'left 0.7s ease-in-out, right 0.7s ease-in-out';
 
     setTimeout(() => {
         // Show next slide in center
-        slides[nextIndex].style.transform = 'none';
+        slides[nextIndex].style.left = '0';
+        slides[nextIndex].style.right = '0';
         slides[nextIndex].style.transition = 'none';
         slides[currentSlide].style.display = 'none';
 
@@ -582,17 +586,20 @@ function prevSlide() {
     const slides = document.querySelectorAll('#carouselContainer > div');
     const prevIndex = (currentSlide - 1 + slideCount) % slideCount;
 
-    // Prepare prev slide from left (off-screen)
-    slides[prevIndex].style.transform = 'translateX(-100vw)';
+    // Position prev slide to the left (off screen)
+    slides[prevIndex].style.left = '-100vw';
+    slides[prevIndex].style.right = 'auto';
     slides[prevIndex].style.display = 'flex';
 
-    // Move current slide to right (off-screen)
-    slides[currentSlide].style.transform = 'translateX(100vw)';
-    slides[currentSlide].style.transition = 'transform 0.7s ease-in-out';
+    // Position current slide to the right (off screen)
+    slides[currentSlide].style.left = '100vw';
+    slides[currentSlide].style.right = 'auto';
+    slides[currentSlide].style.transition = 'left 0.7s ease-in-out, right 0.7s ease-in-out';
 
     setTimeout(() => {
         // Show prev slide in center
-        slides[prevIndex].style.transform = 'none';
+        slides[prevIndex].style.left = '0';
+        slides[prevIndex].style.right = '0';
         slides[prevIndex].style.transition = 'none';
         slides[currentSlide].style.display = 'none';
 
@@ -613,23 +620,27 @@ function goToSlide(index) {
 
     const slides = document.querySelectorAll('#carouselContainer > div');
 
-    // Prepare target slide
+    // Position target slide
     if (index > currentSlide) {
         // Moving forward - prepare from right
-        slides[index].style.transform = 'translateX(100vw)';
+        slides[index].style.left = '100vw';
+        slides[index].style.right = 'auto';
     } else {
         // Moving backward - prepare from left
-        slides[index].style.transform = 'translateX(-100vw)';
+        slides[index].style.left = '-100vw';
+        slides[index].style.right = 'auto';
     }
     slides[index].style.display = 'flex';
 
-    // Move current slide out
-    slides[currentSlide].style.transform = 'translateX(-100vw)';
-    slides[currentSlide].style.transition = 'transform 0.7s ease-in-out';
+    // Position current slide to go off screen
+    slides[currentSlide].style.left = '-100vw';
+    slides[currentSlide].style.right = 'auto';
+    slides[currentSlide].style.transition = 'left 0.7s ease-in-out, right 0.7s ease-in-out';
 
     setTimeout(() => {
         // Show target slide in center
-        slides[index].style.transform = 'none';
+        slides[index].style.left = '0';
+        slides[index].style.right = '0';
         slides[index].style.transition = 'none';
         slides[currentSlide].style.display = 'none';
 
