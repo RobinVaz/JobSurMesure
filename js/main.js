@@ -591,11 +591,26 @@ document.addEventListener('click', function(e) {
 
 // Search Function
 function searchJobs() {
-    const query = document.getElementById('searchQuery').value.toLowerCase();
-    const location = document.getElementById('location').value.toLowerCase();
-    const stageChecked = document.getElementById('stageChecked').checked;
-    const alternanceChecked = document.getElementById('alternanceChecked').checked;
-    const studyLevel = document.getElementById('studyLevel').value;
+    console.log('searchJobs called'); // Debug log
+
+    const queryEl = document.getElementById('searchQuery');
+    const locationEl = document.getElementById('location');
+    const stageCheckedEl = document.getElementById('stageChecked');
+    const alternanceCheckedEl = document.getElementById('alternanceChecked');
+    const studyLevelEl = document.getElementById('studyLevel');
+
+    if (!queryEl || !locationEl || !stageCheckedEl || !alternanceCheckedEl || !studyLevelEl) {
+        console.error('One or more search elements not found');
+        return;
+    }
+
+    const query = queryEl.value.toLowerCase();
+    const location = locationEl.value.toLowerCase();
+    const stageChecked = stageCheckedEl.checked;
+    const alternanceChecked = alternanceCheckedEl.checked;
+    const studyLevel = studyLevelEl.value;
+
+    console.log('Query:', query, 'Location:', location, 'Stage:', stageChecked, 'Alternance:', alternanceChecked); // Debug log
 
     // Filter jobs
     let filtered = [...mockJobs];
@@ -849,6 +864,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (locationInput) {
         locationInput.addEventListener('input', handleLocationInputChange);
+    }
+
+    // Add click listener for search button
+    const searchBtn = document.getElementById('searchBtn');
+    if (searchBtn) {
+        searchBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Search button clicked'); // Debug
+            searchJobs();
+        });
     }
 });
 
