@@ -444,8 +444,11 @@ function loadUser() {
     const savedUser = sessionStorage.getItem('jobsurmesure_user');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
-        updateAuthUI();
+        console.log('User loaded:', currentUser.email);
+    } else {
+        console.log('No user found in session storage');
     }
+    updateAuthUI();
 }
 
 // Store user in sessionStorage
@@ -466,14 +469,14 @@ function updateAuthUI() {
     const userLinks = document.getElementById('userLinks');
 
     if (currentUser) {
-        if (authLinks) authLinks.style.display = 'none';
+        if (authLinks) authLinks.classList.add('hidden');
         if (userLinks) {
-            userLinks.style.display = 'flex';
+            userLinks.classList.remove('hidden');
             document.getElementById('userDisplayName').textContent = currentUser.firstName || 'Bonjour';
         }
     } else {
-        if (authLinks) authLinks.style.display = 'flex';
-        if (userLinks) userLinks.style.display = 'none';
+        if (authLinks) authLinks.classList.remove('hidden');
+        if (userLinks) userLinks.classList.add('hidden');
     }
 }
 
