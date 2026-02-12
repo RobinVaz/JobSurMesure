@@ -508,11 +508,11 @@ function updateCarousel() {
         } else if (index < currentSlide) {
             // Previous slides - hidden to the left
             slide.style.opacity = '0';
-            slide.style.transform = 'translateX(-100%)';
+            slide.style.transform = 'translateX(-100vw)';
         } else {
             // Next slides - hidden to the right
             slide.style.opacity = '0';
-            slide.style.transform = 'translateX(100%)';
+            slide.style.transform = 'translateX(100vw)';
         }
     });
 
@@ -551,11 +551,11 @@ function nextSlide() {
     const nextIndex = (currentSlide + 1) % slideCount;
 
     // Move current slide left (out)
-    slides[currentSlide].style.transform = 'translateX(-100%)';
+    slides[currentSlide].style.transform = 'translateX(-100vw)';
     slides[currentSlide].style.opacity = '0';
 
     // Prepare next slide from right
-    slides[nextIndex].style.transform = 'translateX(100%)';
+    slides[nextIndex].style.transform = 'translateX(100vw)';
     slides[nextIndex].style.opacity = '0';
 
     setTimeout(() => {
@@ -579,11 +579,11 @@ function prevSlide() {
     const prevIndex = (currentSlide - 1 + slideCount) % slideCount;
 
     // Move current slide left (out)
-    slides[currentSlide].style.transform = 'translateX(-100%)';
+    slides[currentSlide].style.transform = 'translateX(-100vw)';
     slides[currentSlide].style.opacity = '0';
 
     // Prepare previous slide from left
-    slides[prevIndex].style.transform = 'translateX(-100%)';
+    slides[prevIndex].style.transform = 'translateX(-100vw)';
     slides[prevIndex].style.opacity = '0';
 
     setTimeout(() => {
@@ -608,15 +608,15 @@ function goToSlide(index) {
     // Determine direction to prepare the target slide correctly
     if (index > currentSlide || (currentSlide === slideCount - 1 && index === 0)) {
         // Moving forward - prepare target from right
-        slides[index].style.transform = 'translateX(100%)';
+        slides[index].style.transform = 'translateX(100vw)';
         slides[index].style.opacity = '0';
     } else if (index < currentSlide || (currentSlide === 0 && index === slideCount - 1)) {
         // Moving backward - prepare target from left
-        slides[index].style.transform = 'translateX(-100%)';
+        slides[index].style.transform = 'translateX(-100vw)';
         slides[index].style.opacity = '0';
     }
 
-    slides[currentSlide].style.transform = 'translateX(-100%)';
+    slides[currentSlide].style.transform = 'translateX(-100vw)';
     slides[currentSlide].style.opacity = '0';
 
     setTimeout(() => {
