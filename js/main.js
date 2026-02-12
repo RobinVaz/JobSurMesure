@@ -1,4 +1,5 @@
 // JobSurMesure - Main JavaScript
+console.log('main.js loaded'); // Debug
 
 // Popular Jobs Dataset (120+ jobs)
 const popularJobs = [
@@ -826,7 +827,8 @@ function initMobileMenu() {
 }
 
 // Initialize
-document.addEventListener('DOMContentLoaded', function() {
+(function init() {
+    console.log('Init function called'); // Debug
     // Load user
     loadUser();
 
@@ -866,16 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
         locationInput.addEventListener('input', handleLocationInputChange);
     }
 
-    // Add click listener for search button
-    const searchBtn = document.getElementById('searchBtn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log('Search button clicked'); // Debug
-            searchJobs();
-        });
-    }
-});
+})();
 
 function updateUploadContent() {
     const cvUploadContent = document.getElementById('cvUploadContent');
