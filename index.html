@@ -542,6 +542,9 @@
     <script src="js/main.js"></script>
     <!-- Professional Modal System -->
     <style>
+        body.modal-open {
+            overflow: hidden;
+        }
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -552,10 +555,12 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 9999;
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.3s ease, visibility 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
         }
         .modal-overlay.active {
             opacity: 1;
@@ -566,13 +571,14 @@
             border-radius: 20px;
             padding: 2rem;
             max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
+            width: 100%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            transform: translateY(20px) scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            margin: auto;
         }
         .modal-overlay.active .modal-content {
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
         .modal-header {
             display: flex;
@@ -581,19 +587,22 @@
             margin-bottom: 1rem;
         }
         .modal-icon {
-            padding: 8px;
+            padding: 10px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
         .modal-icon.success { background: #dcfce7; color: #166534; }
         .modal-icon.error { background: #fee2e2; color: #991b1b; }
         .modal-icon.info { background: #dbeafe; color: #1e40af; }
+        .modal-icon i { width: 24px; height: 24px; }
         .modal-title {
             font-size: 1.25rem;
             font-weight: 700;
             color: #1f2937;
+            margin: 0;
         }
         .modal-body {
             color: #4b5563;
@@ -657,20 +666,36 @@
                         </div>
                         <div class="modal-body">${message}</div>
                         <div class="modal-footer">
-                            <button class="btn-modal btn-secondary" onclick="this.closest('.modal-overlay').remove()">Fermer</button>
+                            <button class="btn-modal btn-secondary" onclick="closeModal()">Fermer</button>
                         </div>
                     </div>
                 `;
 
                 document.body.appendChild(overlay);
+                document.body.classList.add('modal-open');
                 lucide.createIcons();
+
+                // Make sure overlay is centered
+                requestAnimationFrame(() => {
+                    overlay.style.display = 'flex';
+                });
 
                 // Close on overlay click
                 overlay.addEventListener('click', function(e) {
                     if (e.target === overlay) {
-                        overlay.remove();
+                        closeModal();
                     }
                 });
+
+                // Add close function to window for the onclick handler
+                window.closeModal = function() {
+                    overlay.classList.remove('active');
+                    document.body.classList.remove('modal-open');
+                    setTimeout(() => {
+                        overlay.remove();
+                        window.closeModal = undefined;
+                    }, 300);
+                };
 
                 if (callback) {
                     setTimeout(callback, 300);
