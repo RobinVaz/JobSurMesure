@@ -368,12 +368,14 @@ function displayUserProfile(user) {
 // Preview CV
 function previewCv() {
     const cvUrl = currentUser?.profile?.cvUrl;
+    const cvName = currentUser?.profile?.cvName || 'CV_uploadé.pdf';
+
     if (!cvUrl) {
         alert('Veuillez d\'abord uploader votre CV');
         return;
     }
 
-    // Update modal title and filename
+    // Display in modal
     const cvModalTitle = document.getElementById('cvModalTitle');
     const cvModalFilename = document.getElementById('cvModalFilename');
 
@@ -381,10 +383,12 @@ function previewCv() {
         cvModalTitle.textContent = `Mon CV`;
     }
     if (cvModalFilename) {
-        cvModalFilename.textContent = currentUser.profile.cvName || 'CV_uploadé.pdf';
+        cvModalFilename.textContent = cvName;
     }
 
-    document.getElementById('cvPreviewFrame').src = cvUrl;
+    // Use Google Docs Viewer to display both PDF and Word documents
+    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(cvUrl)}&embedded=true`;
+    document.getElementById('cvPreviewFrame').src = viewerUrl;
     document.getElementById('cvModal').classList.remove('hidden');
 }
 
@@ -397,12 +401,14 @@ function closeCvModal() {
 // Preview LM
 function previewLm() {
     const lmUrl = currentUser?.profile?.coverLetterUrl;
+    const lmName = currentUser?.profile?.lmName || 'LM_uploadée.pdf';
+
     if (!lmUrl) {
         alert('Veuillez d\'abord uploader votre lettre de motivation');
         return;
     }
 
-    // Update modal title and filename
+    // Display in modal
     const cvModalTitle = document.getElementById('cvModalTitle');
     const cvModalFilename = document.getElementById('cvModalFilename');
 
@@ -410,10 +416,12 @@ function previewLm() {
         cvModalTitle.textContent = `Lettre de motivation`;
     }
     if (cvModalFilename) {
-        cvModalFilename.textContent = currentUser.profile.lmName || 'LM_uploadée.pdf';
+        cvModalFilename.textContent = lmName;
     }
 
-    document.getElementById('cvPreviewFrame').src = lmUrl;
+    // Use Google Docs Viewer to display both PDF and Word documents
+    const viewerUrl = `https://docs.google.com/gview?url=${encodeURIComponent(lmUrl)}&embedded=true`;
+    document.getElementById('cvPreviewFrame').src = viewerUrl;
     document.getElementById('cvModal').classList.remove('hidden');
 }
 
