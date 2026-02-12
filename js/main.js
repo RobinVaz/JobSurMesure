@@ -505,19 +505,22 @@ let isAnimating = false;
 function updateCarousel() {
     const slides = document.querySelectorAll('#carouselContainer > div');
 
-    // Reset all slides to visible state
+    // Reset all slides to original position (stacked on top of each other)
     slides.forEach((slide, index) => {
         slide.style.transition = 'transform 0.7s ease-in-out, opacity 0.7s ease-in-out';
-        slide.style.transform = 'translateX(0)';
-        slide.style.opacity = '1';
-        slide.classList.remove('hidden');
-        slide.style.display = 'none'; // Hide by default
+        slide.style.position = 'absolute';
+        slide.style.left = '0';
+        slide.style.right = '0';
+        slide.style.top = '0';
+        slide.style.bottom = '0';
+        slide.style.zIndex = '1';
+        slide.style.opacity = '0';
     });
 
-    // Show only the active slide
+    // Show only the active slide on top
     const currentSlideEl = slides[currentSlide];
-    currentSlideEl.style.display = 'flex';
-    currentSlideEl.classList.remove('hidden');
+    currentSlideEl.style.zIndex = '10';
+    currentSlideEl.style.opacity = '1';
 
     // Update dot indicators
     updateDots();
@@ -554,15 +557,20 @@ function nextSlide() {
     const slides = document.querySelectorAll('#carouselContainer > div');
     const nextIndex = (currentSlide + 1) % slideCount;
 
-    // Animate current slide out (slide to left)
-    slides[currentSlide].style.transform = 'translateX(-100%)';
+    // Fade out current slide
     slides[currentSlide].style.opacity = '0';
+    slides[currentSlide].style.zIndex = '1';
 
-    // Animate next slide in (slide from right)
+    // Prepare next slide from right and fade in
     slides[nextIndex].style.transform = 'translateX(100%)';
     slides[nextIndex].style.opacity = '0';
+    slides[nextIndex].style.zIndex = '10';
 
     setTimeout(() => {
+        // Move next slide to center and fade in
+        slides[nextIndex].style.transform = 'translateX(0)';
+        slides[nextIndex].style.opacity = '1';
+
         currentSlide = nextIndex;
         updateCarousel();
         isAnimating = false;
@@ -583,15 +591,20 @@ function prevSlide() {
     const slides = document.querySelectorAll('#carouselContainer > div');
     const prevIndex = (currentSlide - 1 + slideCount) % slideCount;
 
-    // Animate current slide out (slide to left)
-    slides[currentSlide].style.transform = 'translateX(-100%)';
+    // Fade out current slide
     slides[currentSlide].style.opacity = '0';
+    slides[currentSlide].style.zIndex = '1';
 
-    // Animate prev slide in (slide from left)
+    // Prepare prev slide from left and fade in
     slides[prevIndex].style.transform = 'translateX(-100%)';
     slides[prevIndex].style.opacity = '0';
+    slides[prevIndex].style.zIndex = '10';
 
     setTimeout(() => {
+        // Move prev slide to center and fade in
+        slides[prevIndex].style.transform = 'translateX(0)';
+        slides[prevIndex].style.opacity = '1';
+
         currentSlide = prevIndex;
         updateCarousel();
         isAnimating = false;
@@ -611,22 +624,28 @@ function goToSlide(index) {
 
     const slides = document.querySelectorAll('#carouselContainer > div');
 
-    // Animate current slide out (slide to left)
-    slides[currentSlide].style.transform = 'translateX(-100%)';
+    // Fade out current slide
     slides[currentSlide].style.opacity = '0';
+    slides[currentSlide].style.zIndex = '1';
 
     // Prepare target slide
     if (index > currentSlide || (currentSlide === slideCount - 1 && index === 0)) {
         // Moving forward - prepare target from right
         slides[index].style.transform = 'translateX(100%)';
         slides[index].style.opacity = '0';
+        slides[index].style.zIndex = '10';
     } else if (index < currentSlide || (currentSlide === 0 && index === slideCount - 1)) {
         // Moving backward - prepare target from left
         slides[index].style.transform = 'translateX(-100%)';
         slides[index].style.opacity = '0';
+        slides[index].style.zIndex = '10';
     }
 
     setTimeout(() => {
+        // Move target slide to center and fade in
+        slides[index].style.transform = 'translateX(0)';
+        slides[index].style.opacity = '1';
+
         currentSlide = index;
         updateCarousel();
         isAnimating = false;
