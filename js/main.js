@@ -518,6 +518,11 @@ function updateCarousel() {
 
     // Update dot indicators
     updateDots();
+
+    // Re-initialize Lucide icons after carousel transition
+    setTimeout(() => {
+        lucide.createIcons();
+    }, 700);
 }
 
 function updateDots() {
@@ -1018,4 +1023,24 @@ function loadStats() {
 function closeCvModal() {
     document.getElementById('cvModal').classList.add('hidden');
     document.getElementById('cvPreviewFrame').src = '';
+}
+
+// Show AI CV generation modal
+function showAICVModal() {
+    if (!currentUser) {
+        alert('Vous devez être connecté pour générer votre CV avec IA');
+        window.location.href = 'connexion.html';
+        return;
+    }
+    alert('Fonctionnalité de génération de CV avec IA bientôt disponible !');
+}
+
+// Show AI LM generation modal
+function showAILMModal() {
+    if (!currentUser) {
+        alert('Vous devez être connecté pour générer votre lettre de motivation avec IA');
+        window.location.href = 'connexion.html';
+        return;
+    }
+    alert('Fonctionnalité de génération de lettre de motivation avec IA bientôt disponible !');
 }
