@@ -548,24 +548,13 @@ function nextSlide() {
     const slides = document.querySelectorAll('#carouselContainer > div');
     const nextIndex = (currentSlide + 1) % slideCount;
 
-    // Animate current slide out to left
-    slides[currentSlide].style.transition = 'transform 0s ease-in-out';
-    slides[currentSlide].style.transform = 'translateX(-100vw)';
-
-    // Prepare next slide on the right
+    // Hide current slide and show next slide immediately
+    slides[currentSlide].style.display = 'none';
     slides[nextIndex].style.display = 'flex';
-    slides[nextIndex].style.transition = 'transform 0s ease-in-out';
-    slides[nextIndex].style.transform = 'translateX(100vw)';
 
-    setTimeout(() => {
-        // Show next slide in center
-        slides[nextIndex].style.transform = 'translateX(0)';
-        slides[currentSlide].style.display = 'none';
-
-        currentSlide = nextIndex;
-        updateCarousel();
-        isAnimating = false;
-    }, 0);
+    currentSlide = nextIndex;
+    updateCarousel();
+    isAnimating = false;
 }
 
 function prevSlide() {
@@ -580,24 +569,13 @@ function prevSlide() {
     const slides = document.querySelectorAll('#carouselContainer > div');
     const prevIndex = (currentSlide - 1 + slideCount) % slideCount;
 
-    // Animate current slide out to right
-    slides[currentSlide].style.transition = 'transform 0s ease-in-out';
-    slides[currentSlide].style.transform = 'translateX(100vw)';
-
-    // Prepare prev slide on the left
+    // Hide current slide and show prev slide immediately
+    slides[currentSlide].style.display = 'none';
     slides[prevIndex].style.display = 'flex';
-    slides[prevIndex].style.transition = 'transform 0s ease-in-out';
-    slides[prevIndex].style.transform = 'translateX(-100vw)';
 
-    setTimeout(() => {
-        // Show prev slide in center
-        slides[prevIndex].style.transform = 'translateX(0)';
-        slides[currentSlide].style.display = 'none';
-
-        currentSlide = prevIndex;
-        updateCarousel();
-        isAnimating = false;
-    }, 0);
+    currentSlide = prevIndex;
+    updateCarousel();
+    isAnimating = false;
 }
 
 function goToSlide(index) {
@@ -611,33 +589,13 @@ function goToSlide(index) {
 
     const slides = document.querySelectorAll('#carouselContainer > div');
 
-    if (index > currentSlide) {
-        // Moving forward
-        slides[currentSlide].style.transition = 'transform 0s ease-in-out';
-        slides[currentSlide].style.transform = 'translateX(-100vw)';
+    // Hide current slide and show target slide immediately
+    slides[currentSlide].style.display = 'none';
+    slides[index].style.display = 'flex';
 
-        slides[index].style.display = 'flex';
-        slides[index].style.transition = 'transform 0s ease-in-out';
-        slides[index].style.transform = 'translateX(100vw)';
-    } else {
-        // Moving backward
-        slides[currentSlide].style.transition = 'transform 0s ease-in-out';
-        slides[currentSlide].style.transform = 'translateX(100vw)';
-
-        slides[index].style.display = 'flex';
-        slides[index].style.transition = 'transform 0s ease-in-out';
-        slides[index].style.transform = 'translateX(-100vw)';
-    }
-
-    setTimeout(() => {
-        // Show target slide in center
-        slides[index].style.transform = 'translateX(0)';
-        slides[currentSlide].style.display = 'none';
-
-        currentSlide = index;
-        updateCarousel();
-        isAnimating = false;
-    }, 0);
+    currentSlide = index;
+    updateCarousel();
+    isAnimating = false;
 }
 
 // Autocomplete Functions
