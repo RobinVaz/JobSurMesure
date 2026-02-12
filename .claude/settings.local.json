@@ -47,7 +47,9 @@
       "Bash(curl -s \"http://localhost:3000/api/jobs/$i\")",
       "Bash(done)",
       "Bash(git add -A)",
-      "Bash(git commit -m \"$\\(cat <<''EOF''\nCorriger 10 bugs critiques\n\n- Bug 1: sessionStorage/localStorage mismatch -统一使用 localStorage\n- Bug 2: Undefined event in filterApplications - add event parameter\n- Bug 3: Wrong mobile menu links - use logout\\(\\) button\n- Bug 4: Missing mobile menu - add menu structure\n- Bug 5: Missing logout function - add logout\\(\\) across files\n- Bug 6: API endpoint consistency - verify try/catch handling\n- Bug 7: Null check in previewCv - verify currentUser?.profile?.cvUrl\n- Bug 8: Duplicate roadmap data - remove duplicate CTO entry\n- Bug 9: Missing DOM element - add preferredLocationsInput\n- Bug 10: Carousel functions - verify functions exist in main.js\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nCorriger 10 bugs critiques\n\n- Bug 1: sessionStorage/localStorage mismatch -统一使用 localStorage\n- Bug 2: Undefined event in filterApplications - add event parameter\n- Bug 3: Wrong mobile menu links - use logout\\(\\) button\n- Bug 4: Missing mobile menu - add menu structure\n- Bug 5: Missing logout function - add logout\\(\\) across files\n- Bug 6: API endpoint consistency - verify try/catch handling\n- Bug 7: Null check in previewCv - verify currentUser?.profile?.cvUrl\n- Bug 8: Duplicate roadmap data - remove duplicate CTO entry\n- Bug 9: Missing DOM element - add preferredLocationsInput\n- Bug 10: Carousel functions - verify functions exist in main.js\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(xxd)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nReplace logo with logo.png and update favicon\n\n- Replace briefcase icon logo with logo.png in navbar\n- Add favicon link pointing to logo.png\n- Update 18 HTML files \\(9 main + 9 stagematch-html\\)\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\")"
     ]
   }
 }
