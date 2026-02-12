@@ -520,7 +520,7 @@ function updateCarousel() {
     // Re-initialize Lucide icons after carousel transition
     setTimeout(() => {
         lucide.createIcons();
-    }, 700);
+    }, 0);
 }
 
 function updateDots() {
@@ -549,12 +549,12 @@ function nextSlide() {
     const nextIndex = (currentSlide + 1) % slideCount;
 
     // Animate current slide out to left
-    slides[currentSlide].style.transition = 'transform 0.7s ease-in-out';
+    slides[currentSlide].style.transition = 'transform 0s ease-in-out';
     slides[currentSlide].style.transform = 'translateX(-100vw)';
 
     // Prepare next slide on the right
     slides[nextIndex].style.display = 'flex';
-    slides[nextIndex].style.transition = 'transform 0.7s ease-in-out';
+    slides[nextIndex].style.transition = 'transform 0s ease-in-out';
     slides[nextIndex].style.transform = 'translateX(100vw)';
 
     setTimeout(() => {
@@ -565,7 +565,7 @@ function nextSlide() {
         currentSlide = nextIndex;
         updateCarousel();
         isAnimating = false;
-    }, 700);
+    }, 0);
 }
 
 function prevSlide() {
@@ -581,12 +581,12 @@ function prevSlide() {
     const prevIndex = (currentSlide - 1 + slideCount) % slideCount;
 
     // Animate current slide out to right
-    slides[currentSlide].style.transition = 'transform 0.7s ease-in-out';
+    slides[currentSlide].style.transition = 'transform 0s ease-in-out';
     slides[currentSlide].style.transform = 'translateX(100vw)';
 
     // Prepare prev slide on the left
     slides[prevIndex].style.display = 'flex';
-    slides[prevIndex].style.transition = 'transform 0.7s ease-in-out';
+    slides[prevIndex].style.transition = 'transform 0s ease-in-out';
     slides[prevIndex].style.transform = 'translateX(-100vw)';
 
     setTimeout(() => {
@@ -597,7 +597,7 @@ function prevSlide() {
         currentSlide = prevIndex;
         updateCarousel();
         isAnimating = false;
-    }, 700);
+    }, 0);
 }
 
 function goToSlide(index) {
@@ -613,19 +613,19 @@ function goToSlide(index) {
 
     if (index > currentSlide) {
         // Moving forward
-        slides[currentSlide].style.transition = 'transform 0.7s ease-in-out';
+        slides[currentSlide].style.transition = 'transform 0s ease-in-out';
         slides[currentSlide].style.transform = 'translateX(-100vw)';
 
         slides[index].style.display = 'flex';
-        slides[index].style.transition = 'transform 0.7s ease-in-out';
+        slides[index].style.transition = 'transform 0s ease-in-out';
         slides[index].style.transform = 'translateX(100vw)';
     } else {
         // Moving backward
-        slides[currentSlide].style.transition = 'transform 0.7s ease-in-out';
+        slides[currentSlide].style.transition = 'transform 0s ease-in-out';
         slides[currentSlide].style.transform = 'translateX(100vw)';
 
         slides[index].style.display = 'flex';
-        slides[index].style.transition = 'transform 0.7s ease-in-out';
+        slides[index].style.transition = 'transform 0s ease-in-out';
         slides[index].style.transform = 'translateX(-100vw)';
     }
 
@@ -637,7 +637,7 @@ function goToSlide(index) {
         currentSlide = index;
         updateCarousel();
         isAnimating = false;
-    }, 700);
+    }, 0);
 }
 
 // Autocomplete Functions
