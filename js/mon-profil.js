@@ -375,7 +375,7 @@ function previewCv() {
     const cvName = currentUser?.profile?.cvName || 'CV_uploadé.pdf';
 
     if (!cvUrl) {
-        alert('Veuillez d\'abord uploader votre CV');
+        Modal.error('Erreur', 'Veuillez d\'abord uploader votre CV');
         return;
     }
 
@@ -414,7 +414,7 @@ function previewLm() {
     const lmName = currentUser?.profile?.lmName || 'LM_uploadée.pdf';
 
     if (!lmUrl) {
-        alert('Veuillez d\'abord uploader votre lettre de motivation');
+        Modal.error('Erreur', 'Veuillez d\'abord uploader votre lettre de motivation');
         return;
     }
 
@@ -516,13 +516,13 @@ function deleteCv() {
 // Save profile
 async function saveProfile() {
     if (!currentUser) {
-        alert('Veuillez vous connecter');
+        Modal.error('Erreur', 'Veuillez vous connecter');
         return;
     }
 
     const submitBtn = document.getElementById('saveProfileBtn');
     if (!submitBtn) {
-        alert('Erreur: bouton de sauvegarde non trouvé');
+        Modal.error('Erreur', 'Bouton de sauvegarde non trouvé');
         return;
     }
 
@@ -608,7 +608,7 @@ async function saveProfile() {
             console.log('Server not reachable, data saved locally only');
         }
 
-        alert('Profil sauvegardé avec succès !');
+        Modal.success('Succès', 'Profil sauvegardé avec succès !');
 
         // Update display
         document.getElementById('userStudyLevel').textContent = `Étudiant en ${profile.studyLevel || 'Bac+3'}`;
@@ -722,7 +722,7 @@ async function uploadCv(event) {
         };
         reader.readAsDataURL(file);
     } else {
-        alert('Veuillez vous connecter pour uploader votre CV');
+        Modal.error('Erreur', 'Veuillez vous connecter pour uploader votre CV');
         window.location.href = 'connexion.html';
     }
 }
@@ -792,7 +792,7 @@ async function uploadLm(event) {
         };
         reader.readAsDataURL(file);
     } else {
-        alert('Veuillez vous connecter pour uploader votre lettre de motivation');
+        Modal.error('Erreur', 'Veuillez vous connecter pour uploader votre lettre de motivation');
         window.location.href = 'connexion.html';
     }
 }

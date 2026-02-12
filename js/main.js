@@ -864,7 +864,7 @@ function initUploads() {
                     const base64 = e.target.result;
                     // In a real app, this would be saved to backend
                     // For demo, we show success message
-                    alert(`CV "${file.name}" uploadé avec succès !`);
+                    Modal.success('Succès', `CV "${file.name}" uploadé avec succès !`);
                 };
                 reader.readAsDataURL(file);
             }
@@ -877,7 +877,7 @@ function initUploads() {
                 const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    alert(`Lettre de motivation "${file.name}" uploadée avec succès !`);
+                    Modal.success('Succès', `Lettre de motivation "${file.name}" uploadée avec succès !`);
                 };
                 reader.readAsDataURL(file);
             }
@@ -995,19 +995,19 @@ function closeCvModal() {
 // Show AI CV generation modal
 function showAICVModal() {
     if (!currentUser) {
-        alert('Vous devez être connecté pour générer votre CV avec IA');
+        Modal.error('Erreur', 'Vous devez être connecté pour générer votre CV avec IA');
         window.location.href = 'connexion.html';
         return;
     }
-    alert('Fonctionnalité de génération de CV avec IA bientôt disponible !');
+    Modal.info('Bientôt disponible', 'La fonctionnalité de génération de CV avec IA arrive prochainement !');
 }
 
 // Show AI LM generation modal
 function showAILMModal() {
     if (!currentUser) {
-        alert('Vous devez être connecté pour générer votre lettre de motivation avec IA');
+        Modal.error('Erreur', 'Vous devez être connecté pour générer votre lettre de motivation avec IA');
         window.location.href = 'connexion.html';
         return;
     }
-    alert('Fonctionnalité de génération de lettre de motivation avec IA bientôt disponible !');
+    Modal.info('Bientôt disponible', 'La fonctionnalité de génération de lettre de motivation avec IA arrive prochainement !');
 }

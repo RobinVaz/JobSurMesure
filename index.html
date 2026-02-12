@@ -540,11 +540,155 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <!-- Professional Modal System -->
+    <style>
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        .modal-icon {
+            padding: 8px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-icon.success { background: #dcfce7; color: #166534; }
+        .modal-icon.error { background: #fee2e2; color: #991b1b; }
+        .modal-icon.info { background: #dbeafe; color: #1e40af; }
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+        }
+        .modal-body {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-modal {
+            padding: 0.625rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            font-size: 0.875rem;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .btn-secondary:hover { background: #d1d5db; }
+    </style>
     <script>
         // Initialize Lucide icons after DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
             lucide.createIcons();
         });
+
+        // Professional Modal System
+        const Modal = {
+            show: function(title, message, type = 'info', callback = null) {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay active';
+
+                const icons = {
+                    success: '<i data-lucide="circle-check" class="w-6 h-6"></i>',
+                    error: '<i data-lucide="circle-x" class="w-6 h-6"></i>',
+                    info: '<i data-lucide="info" class="w-6 h-6"></i>'
+                };
+
+                const colors = {
+                    success: 'success',
+                    error: 'error',
+                    info: 'info'
+                };
+
+                overlay.innerHTML = `
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <div class="modal-icon ${colors[type]}">${icons[type]}</div>
+                            <h3 class="modal-title">${title}</h3>
+                        </div>
+                        <div class="modal-body">${message}</div>
+                        <div class="modal-footer">
+                            <button class="btn-modal btn-secondary" onclick="this.closest('.modal-overlay').remove()">Fermer</button>
+                        </div>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+                lucide.createIcons();
+
+                // Close on overlay click
+                overlay.addEventListener('click', function(e) {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                    }
+                });
+
+                if (callback) {
+                    setTimeout(callback, 300);
+                }
+            },
+
+            success: function(title, message, callback) {
+                this.show(title, message, 'success', callback);
+            },
+
+            error: function(title, message) {
+                this.show(title, message, 'error');
+            },
+
+            info: function(title, message, callback) {
+                this.show(title, message, 'info', callback);
+            }
+        };
     </script>
 </body>
 </html>

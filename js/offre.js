@@ -145,7 +145,7 @@ async function generateCV() {
     const user = getCurrentUser();
 
     if (!user) {
-        alert('Veuillez vous connecter pour générer votre CV');
+        Modal.error('Erreur', 'Veuillez vous connecter pour générer votre CV');
         closeAIGenerationModal();
         return;
     }
@@ -197,11 +197,11 @@ Suit les recommandations de l'IA pour maximiser vos chances de succès.`;
         a.click();
         URL.revokeObjectURL(url);
 
-        alert('CV généré et téléchargé avec succès!');
+        Modal.success('Succès', 'CV généré et téléchargé avec succès!');
         closeAIGenerationModal();
     } catch (err) {
         console.error('Error generating CV:', err);
-        alert('Erreur lors de la génération du CV');
+        Modal.error('Erreur', 'Erreur lors de la génération du CV');
     } finally {
         btn.textContent = originalText;
         btn.disabled = false;
@@ -214,7 +214,7 @@ async function generateLM() {
     const user = getCurrentUser();
 
     if (!user) {
-        alert('Veuillez vous connecter pour générer votre lettre de motivation');
+        Modal.error('Erreur', 'Veuillez vous connecter pour générer votre lettre de motivation');
         closeAIGenerationModal();
         return;
     }
@@ -257,11 +257,11 @@ ${user.email}
         a.click();
         URL.revokeObjectURL(url);
 
-        alert('Lettre de motivation générée et téléchargée avec succès!');
+        Modal.success('Succès', 'Lettre de motivation générée et téléchargée avec succès!');
         closeAIGenerationModal();
     } catch (err) {
         console.error('Error generating LM:', err);
-        alert('Erreur lors de la génération de la lettre de motivation');
+        Modal.error('Erreur', 'Erreur lors de la génération de la lettre de motivation');
     } finally {
         btn.textContent = originalText;
         btn.disabled = false;
@@ -578,7 +578,7 @@ function addApplication(app) {
 async function applyToJob() {
     const user = getCurrentUser();
     if (!user) {
-        alert('Vous devez être connecté pour postuler');
+        Modal.error('Erreur', 'Vous devez être connecté pour postuler');
         window.location.href = 'connexion.html';
         return;
     }
@@ -619,12 +619,12 @@ async function applyToJob() {
             body: JSON.stringify(apiApplication)
         });
 
-        alert('Candidature envoyée avec succès !');
+        Modal.success('Succès', 'Candidature envoyée avec succès !');
         window.location.href = 'candidatures.html';
     } catch (err) {
         console.error('Error applying:', err);
         // Even if API fails, the app was saved to localStorage
-        alert('Candidature enregistrée localement. Elle apparaîtra dans vos candidatures.');
+        Modal.info('Sauvegardé localement', 'Candidature enregistrée localement. Elle apparaîtra dans vos candidatures.');
         window.location.href = 'candidatures.html';
     } finally {
         btn.textContent = originalText;
@@ -643,7 +643,7 @@ function saveJob() {
 
     if (btn.classList.contains('bg-blue-50')) {
         btn.innerHTML = '<i data-lucide="bookmark" class="w-5 h-5 fill-current"></i> Sauvegardé';
-        alert('Offre sauvegardée dans votre liste');
+        Modal.success('Succès', 'Offre sauvegardée dans votre liste');
     } else {
         btn.innerHTML = '<i data-lucide="bookmark" class="w-5 h-5"></i> Sauvegarder';
     }
