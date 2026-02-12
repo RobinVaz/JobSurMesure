@@ -70,47 +70,55 @@
         </div>
     </nav>
 
-    <!-- Carousel Hero -->
+    <!-- Carousel Hero - Animated/Colorful Style -->
     <section class="relative h-[400px] md:h-[500px] overflow-hidden">
-        <div id="carouselSlides">
+        <div id="carouselSlides" class="absolute inset-0">
             <!-- Slide 1: Trouver son stage/alternance -->
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 text-white transition-all duration-700 ease-in-out opacity-100 translate-x-0">
+            <div class="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 text-white transition-all duration-700 ease-in-out opacity-100 translate-x-0 z-10">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-sm font-medium mb-6 backdrop-blur-sm">
-                                <i data-lucide="briefcase" class="w-4 h-4"></i>
-                                <span>Stage & Alternance</span>
+                    <div class="grid md:grid-cols-2 gap-10 items-center">
+                        <div class="animate-bounce-slow">
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-6 shadow-lg">
+                                <i data-lucide="briefcase" class="w-5 h-5 animate-pulse"></i>
+                                <span class="font-bold">Stage & Alternance</span>
                             </div>
-                            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-                                Trouvez votre stage<br>
-                                <span class="text-yellow-300">ou alternance idéal</span>
+                            <h1 class="text-5xl md:text-6xl lg:text-7xl font-black mb-4 leading-tight drop-shadow-xl">
+                                Trouvez votre<br>
+                                <span class="text-yellow-300 animate-pulse">stage idéal</span>
                             </h1>
-                            <p class="text-lg md:text-xl text-blue-100 mb-8 max-w-md">Des milliers d'offres vérifiées par nos équipes pour lancer votre carrière</p>
-                            <div class="flex flex-wrap gap-3">
-                                <a href="recherche.html" class="px-6 py-3 bg-white text-blue-700 rounded-xl font-semibold hover:bg-blue-50 transition-colors">
-                                    Explorer les offres
+                            <p class="text-xl md:text-2xl text-white/90 mb-8 font-medium">Des milliers d'offres pour lancer votre carrière</p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="recherche.html" class="px-8 py-4 bg-white text-indigo-600 rounded-2xl font-black text-lg hover:bg-pink-50 hover:scale-105 transition-all shadow-xl">
+                                    Explorer les offres 🚀
                                 </a>
-                                <a href="mon-profil.html" class="px-6 py-3 bg-blue-800/50 text-white rounded-xl font-semibold hover:bg-blue-800/70 transition-colors backdrop-blur-sm">
-                                    Créer mon profil
+                                <a href="mon-profil.html" class="px-8 py-4 bg-white/20 backdrop-blur-sm border border-white/40 text-white rounded-2xl font-bold text-lg hover:bg-white/30 transition-all shadow-lg">
+                                    Créer mon profil 💼
                                 </a>
                             </div>
                         </div>
-                        <div class="hidden lg:block">
-                            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                                <div class="text-8xl mb-4">🎯</div>
-                                <div class="space-y-3">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-300"><i data-lucide="check" class="w-4 h-4"></i></div>
-                                        <span class="text-blue-100">Offres vérifiées</span>
+                        <div class="hidden lg:block relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+                            <div class="relative bg-white/10 backdrop-blur-xl rounded-3xl p-8 border-2 border-white/30 shadow-2xl transform rotate-3 hover:rotate-6 transition-transform duration-500">
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div class="bg-white/20 rounded-2xl p-4 text-center">
+                                        <div class="text-5xl mb-2">🎯</div>
+                                        <h4 class="font-bold">Offres</h4>
+                                        <p class="text-3xl font-black">1500+</p>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-300"><i data-lucide="check" class="w-4 h-4"></i></div>
-                                        <span class="text-blue-100">Matching intelligent</span>
+                                    <div class="bg-white/20 rounded-2xl p-4 text-center">
+                                        <div class="text-5xl mb-2">✅</div>
+                                        <h4 class="font-bold">Vérifiées</h4>
+                                        <p class="text-3xl font-black">100%</p>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-300"><i data-lucide="check" class="w-4 h-4"></i></div>
-                                        <span class="text-blue-100">Suivi personnalisé</span>
+                                    <div class="bg-white/20 rounded-2xl p-4 text-center">
+                                        <div class="text-5xl mb-2">🤖</div>
+                                        <h4 class="font-bold">Matching</h4>
+                                        <p class="text-3xl font-black">Intelligent</p>
+                                    </div>
+                                    <div class="bg-white/20 rounded-2xl p-4 text-center">
+                                        <div class="text-5xl mb-2">⭐</div>
+                                        <h4 class="font-bold">Satisfaction</h4>
+                                        <p class="text-3xl font-black">98%</p>
                                     </div>
                                 </div>
                             </div>
@@ -119,45 +127,44 @@
                 </div>
             </div>
             <!-- Slide 2: Modifier son CV -->
-            <div class="absolute inset-0 bg-gradient-to-br from-green-500 via-green-600 to-green-700 text-white transition-all duration-700 ease-in-out opacity-0 translate-x-full">
+            <div class="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-500 to-teal-600 text-white transition-all duration-700 ease-in-out opacity-0 translate-x-full z-10">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="order-2 md:order-1">
-                            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 max-w-md mx-auto shadow-2xl transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                                <div class="bg-white/95 rounded-lg p-4 h-48 flex flex-col gap-3">
-                                    <div class="flex items-center justify-between border-b pb-2">
-                                        <div class="h-8 w-8 rounded bg-blue-500"></div>
-                                        <div class="h-4 w-20 rounded bg-gray-200"></div>
+                    <div class="grid md:grid-cols-2 gap-10 items-center">
+                        <div class="order-2 md:order-1 relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl blur-2xl opacity-40 animate-pulse"></div>
+                            <div class="relative bg-white/10 backdrop-blur-xl rounded-3xl p-6 border-2 border-white/30 shadow-2xl transform hover:scale-105 transition-all">
+                                <div class="bg-white/95 rounded-xl p-6 h-64 flex flex-col gap-4 shadow-xl">
+                                    <div class="flex items-center justify-between border-b-2 border-dashed border-gray-300 pb-3">
+                                        <div class="w-10 h-10 rounded-lg bg-blue-500"></div>
+                                        <div class="h-5 w-24 rounded bg-gray-200"></div>
                                     </div>
-                                    <div class="h-3 w-3/4 rounded bg-gray-200"></div>
-                                    <div class="h-3 w-1/2 rounded bg-gray-200"></div>
-                                    <div class="h-3 w-5/6 rounded bg-gray-200"></div>
-                                    <div class="h-3 w-2/3 rounded bg-gray-200"></div>
-                                </div>
-                                <div class="mt-4 bg-white/95 rounded-lg p-4 h-32 flex flex-col gap-2">
-                                    <div class="h-3 w-1/3 rounded bg-gray-200"></div>
-                                    <div class="h-3 w-full rounded bg-gray-200"></div>
-                                    <div class="h-3 w-4/5 rounded bg-gray-200"></div>
-                                    <div class="h-3 w-3/4 rounded bg-gray-200"></div>
+                                    <div class="h-4 w-full rounded bg-gray-200 animate-pulse"></div>
+                                    <div class="h-4 w-4/5 rounded bg-gray-200 animate-pulse"></div>
+                                    <div class="h-4 w-3/4 rounded bg-gray-200 animate-pulse"></div>
+                                    <div class="h-4 w-5/6 rounded bg-gray-200 animate-pulse"></div>
+                                    <div class="mt-auto pt-3 flex justify-between items-center">
+                                        <div class="h-3 w-24 rounded bg-green-400"></div>
+                                        <div class="px-3 py-1 bg-green-500 rounded text-xs font-bold">PDF</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="order-1 md:order-2">
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-sm font-medium mb-6 backdrop-blur-sm">
-                                <i data-lucide="file-text" class="w-4 h-4"></i>
-                                <span>Votre CV</span>
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-6 shadow-lg">
+                                <i data-lucide="file-text" class="w-5 h-5 animate-pulse"></i>
+                                <span class="font-bold">Votre CV</span>
                             </div>
-                            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                            <h1 class="text-5xl md:text-6xl lg:text-7xl font-black mb-4 leading-tight drop-shadow-xl">
                                 Un CV qui<br>
-                                <span class="text-yellow-300">impressionne</span>
+                                <span class="text-yellow-300 animate-pulse">impressionne</span>
                             </h1>
-                            <p class="text-lg md:text-xl text-green-100 mb-8">Uploadez votre CV pour bénéficier de matchs personnalisés avec les offres</p>
-                            <div class="flex flex-wrap gap-3">
-                                <a href="mon-profil.html" class="px-6 py-3 bg-white text-green-700 rounded-xl font-semibold hover:bg-green-50 transition-colors">
-                                    Upload mon CV
+                            <p class="text-xl md:text-2xl text-white/90 mb-8 font-medium">Uploadez pour des matchs personnalisés</p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="mon-profil.html" class="px-8 py-4 bg-white text-green-700 rounded-2xl font-black text-lg hover:bg-emerald-50 hover:scale-105 transition-all shadow-xl">
+                                    Upload mon CV 📄
                                 </a>
-                                <button onclick="showAICVModal()" class="px-6 py-3 bg-green-800/50 text-white rounded-xl font-semibold hover:bg-green-800/70 transition-colors backdrop-blur-sm">
-                                    Générer avec IA
+                                <button onclick="showAICVModal()" class="px-8 py-4 bg-white/20 backdrop-blur-sm border border-white/40 text-white rounded-2xl font-bold text-lg hover:bg-white/30 transition-all shadow-lg">
+                                    Générer avec IA ✨
                                 </button>
                             </div>
                         </div>
@@ -165,43 +172,52 @@
                 </div>
             </div>
             <!-- Slide 3: Modifier sa lettre -->
-            <div class="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-700 to-purple-900 text-white transition-all duration-700 ease-in-out opacity-0 translate-x-full">
+            <div class="absolute inset-0 bg-gradient-to-r from-purple-500 via-pink-500 to-rose-600 text-white transition-all duration-700 ease-in-out opacity-0 translate-x-full z-10">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div class="grid md:grid-cols-2 gap-10 items-center">
                         <div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-sm font-medium mb-6 backdrop-blur-sm">
-                                <i data-lucide="pen-tool" class="w-4 h-4"></i>
-                                <span>Lettre de motivation</span>
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-6 shadow-lg">
+                                <i data-lucide="pen-tool" class="w-5 h-5 animate-pulse"></i>
+                                <span class="font-bold">LM</span>
                             </div>
-                            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                            <h1 class="text-5xl md:text-6xl lg:text-7xl font-black mb-4 leading-tight drop-shadow-xl">
                                 Une LM qui<br>
-                                <span class="text-yellow-300">décroche les entretiens</span>
+                                <span class="text-yellow-300 animate-pulse">décroche</span>
                             </h1>
-                            <p class="text-lg md:text-xl text-purple-100 mb-8">Personnalisez votre lettre pour chaque offre et augmentez vos chances</p>
-                            <div class="flex flex-wrap gap-3">
-                                <a href="mon-profil.html" class="px-6 py-3 bg-white text-purple-700 rounded-xl font-semibold hover:bg-purple-50 transition-colors">
-                                    Upload ma LM
+                            <p class="text-xl md:text-2xl text-white/90 mb-8 font-medium">Personnalisez pour chaque offre</p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="mon-profil.html" class="px-8 py-4 bg-white text-purple-700 rounded-2xl font-black text-lg hover:bg-pink-50 hover:scale-105 transition-all shadow-xl">
+                                    Upload ma LM 📩
                                 </a>
-                                <button onclick="showAILMModal()" class="px-6 py-3 bg-purple-800/50 text-white rounded-xl font-semibold hover:bg-purple-800/70 transition-colors backdrop-blur-sm">
-                                    Générer avec IA
+                                <button onclick="showAILMModal()" class="px-8 py-4 bg-white/20 backdrop-blur-sm border border-white/40 text-white rounded-2xl font-bold text-lg hover:bg-white/30 transition-all shadow-lg">
+                                    Générer avec IA ✨
                                 </button>
                             </div>
                         </div>
-                        <div class="hidden lg:block">
-                            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
-                                <div class="text-8xl mb-4">✉️</div>
-                                <div class="space-y-3">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-300"><i data-lucide="check" class="w-4 h-4"></i></div>
-                                        <span class="text-purple-100">Contenu personnalisé</span>
+                        <div class="hidden lg:block relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-pink-500 to-purple-600 rounded-full blur-3xl opacity-30 animate-pulse"></div>
+                            <div class="relative bg-white/10 backdrop-blur-xl rounded-3xl p-8 border-2 border-white/30 shadow-2xl transform -rotate-3 hover:rotate-6 transition-transform duration-500">
+                                <div class="space-y-4">
+                                    <div class="flex items-center gap-4 p-4 bg-white/20 rounded-xl">
+                                        <div class="text-4xl">💌</div>
+                                        <div>
+                                            <h4 class="font-bold text-lg">Personnalisé</h4>
+                                            <p class="text-sm">Adapté à l'offre</p>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-300"><i data-lucide="check" class="w-4 h-4"></i></div>
-                                        <span class="text-purple-100">Adapté à l'offre</span>
+                                    <div class="flex items-center gap-4 p-4 bg-white/20 rounded-xl">
+                                        <div class="text-4xl">🎯</div>
+                                        <div>
+                                            <h4 class="font-bold text-lg">Pour l'entreprise</h4>
+                                            <p class="text-sm">Réponse aux besoins</p>
+                                        </div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-300"><i data-lucide="check" class="w-4 h-4"></i></div>
-                                        <span class="text-purple-100">Style professionnel</span>
+                                    <div class="flex items-center gap-4 p-4 bg-white/20 rounded-xl">
+                                        <div class="text-4xl">🏆</div>
+                                        <div>
+                                            <h4 class="font-bold text-lg">Style pro</h4>
+                                            <p class="text-sm">Format parfait</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -210,58 +226,51 @@
                 </div>
             </div>
             <!-- Slide 4: Préparer l'entretien -->
-            <div class="absolute inset-0 bg-gradient-to-br from-emerald-600 via-emerald-700 to-emerald-900 text-white transition-all duration-700 ease-in-out opacity-0 translate-x-full">
+            <div class="absolute inset-0 bg-gradient-to-r from-orange-400 via-red-500 to-pink-600 text-white transition-all duration-700 ease-in-out opacity-0 translate-x-full z-10">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div class="order-2 md:order-1">
-                            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20 max-w-md mx-auto shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-500">
-                                <div class="bg-white/95 rounded-lg p-5 h-60 flex flex-col gap-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white">💻</div>
-                                        <div class="flex-1">
-                                            <div class="h-4 w-3/4 rounded bg-gray-200 mb-2"></div>
-                                            <div class="h-3 w-1/2 rounded bg-gray-200"></div>
-                                        </div>
+                    <div class="grid md:grid-cols-2 gap-10 items-center">
+                        <div class="order-2 md:order-1 relative">
+                            <div class="absolute inset-0 bg-gradient-to-br from-red-500 to-orange-600 rounded-2xl blur-2xl opacity-40 animate-pulse"></div>
+                            <div class="relative bg-white/10 backdrop-blur-xl rounded-3xl p-6 border-2 border-white/30 shadow-2xl transform hover:scale-105 transition-all">
+                                <div class="bg-white/95 rounded-xl p-6 h-72 flex flex-col gap-4 shadow-xl">
+                                    <div class="flex items-center gap-3 p-3 bg-blue-500 rounded-lg">
+                                        <div class="text-3xl">💻</div>
+                                        <div class="h-3 w-32 rounded bg-blue-600"></div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center text-white">📝</div>
-                                        <div class="flex-1">
-                                            <div class="h-4 w-3/4 rounded bg-gray-200 mb-2"></div>
-                                            <div class="h-3 w-1/2 rounded bg-gray-200"></div>
-                                        </div>
+                                    <div class="flex items-center gap-3 p-3 bg-green-500 rounded-lg">
+                                        <div class="text-3xl">📝</div>
+                                        <div class="h-3 w-28 rounded bg-green-600"></div>
                                     </div>
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center text-white">💼</div>
-                                        <div class="flex-1">
-                                            <div class="h-4 w-3/4 rounded bg-gray-200 mb-2"></div>
-                                            <div class="h-3 w-1/2 rounded bg-gray-200"></div>
-                                        </div>
+                                    <div class="flex items-center gap-3 p-3 bg-purple-500 rounded-lg">
+                                        <div class="text-3xl">💼</div>
+                                        <div class="h-3 w-24 rounded bg-purple-600"></div>
                                     </div>
-                                    <div class="mt-auto pt-3 border-t border-gray-200">
-                                        <div class="flex justify-between text-sm">
-                                            <span class="h-3 w-20 rounded bg-gray-200"></span>
-                                            <span class="h-3 w-12 rounded bg-green-500"></span>
+                                    <div class="mt-auto pt-3 flex justify-between items-center">
+                                        <div class="text-4xl">🚀</div>
+                                        <div class="text-center">
+                                            <div class="text-3xl font-black">85%</div>
+                                            <div class="text-xs text-gray-500">Succès entretien</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="order-1 md:order-2">
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-sm font-medium mb-6 backdrop-blur-sm">
-                                <i data-lucide="circle-help" class="w-4 h-4"></i>
-                                <span>Préparation entretien</span>
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 mb-6 shadow-lg">
+                                <i data-lucide="circle-help" class="w-5 h-5 animate-pulse"></i>
+                                <span class="font-bold">Entretien</span>
                             </div>
-                            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+                            <h1 class="text-5xl md:text-6xl lg:text-7xl font-black mb-4 leading-tight drop-shadow-xl">
                                 Préparez votre<br>
-                                <span class="text-yellow-300">entretien avec succès</span>
+                                <span class="text-yellow-300 animate-pulse">entretien</span>
                             </h1>
-                            <p class="text-lg md:text-xl text-emerald-100 mb-8">Quiz, questions types et conseils pour réussir votre entretien</p>
-                            <div class="flex flex-wrap gap-3">
-                                <a href="preparation-entretien.html" class="px-6 py-3 bg-white text-emerald-700 rounded-xl font-semibold hover:bg-emerald-50 transition-colors">
-                                    Commencer la préparation
+                            <p class="text-xl md:text-2xl text-white/90 mb-8 font-medium">Quiz, questions & conseils pour réussir</p>
+                            <div class="flex flex-wrap gap-4">
+                                <a href="preparation-entretien.html" class="px-8 py-4 bg-white text-orange-600 rounded-2xl font-black text-lg hover:bg-red-50 hover:scale-105 transition-all shadow-xl">
+                                    Commencer 🎯
                                 </a>
-                                <a href="recherche.html" class="px-6 py-3 bg-emerald-800/50 text-white rounded-xl font-semibold hover:bg-emerald-800/70 transition-colors backdrop-blur-sm">
-                                    Voir plus d'offres
+                                <a href="recherche.html" class="px-8 py-4 bg-white/20 backdrop-blur-sm border border-white/40 text-white rounded-2xl font-bold text-lg hover:bg-white/30 transition-all shadow-lg">
+                                    Voir plus d'offres 📋
                                 </a>
                             </div>
                         </div>
@@ -269,19 +278,33 @@
                 </div>
             </div>
         </div>
-        <button onclick="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 p-3 rounded-full transition-colors">
-            <i data-lucide="chevron-left" class="w-6 h-6 text-white"></i>
+
+        <!-- Navigation Buttons -->
+        <button onclick="prevSlide()" class="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-indigo-600 p-4 rounded-2xl transition-all shadow-2xl hover:scale-110 z-20">
+            <i data-lucide="chevron-left" class="w-6 h-6"></i>
         </button>
-        <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 p-3 rounded-full transition-colors">
-            <i data-lucide="chevron-right" class="w-6 h-6 text-white"></i>
+        <button onclick="nextSlide()" class="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-indigo-600 p-4 rounded-2xl transition-all shadow-2xl hover:scale-110 z-20">
+            <i data-lucide="chevron-right" class="w-6 h-6"></i>
         </button>
-        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-            <button onclick="goToSlide(0)" class="carousel-dot w-8 h-3 rounded-full transition-all bg-white"></button>
-            <button onclick="goToSlide(1)" class="carousel-dot w-3 h-3 rounded-full transition-all bg-white/50"></button>
-            <button onclick="goToSlide(2)" class="carousel-dot w-3 h-3 rounded-full transition-all bg-white/50"></button>
-            <button onclick="goToSlide(3)" class="carousel-dot w-3 h-3 rounded-full transition-all bg-white/50"></button>
+
+        <!-- Dot Indicators -->
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+            <button onclick="goToSlide(0)" class="carousel-dot w-12 h-4 rounded-full transition-all bg-white shadow-lg hover:scale-125"></button>
+            <button onclick="goToSlide(1)" class="carousel-dot w-4 h-4 rounded-full transition-all bg-white/50 hover:bg-white/80 hover:scale-125"></button>
+            <button onclick="goToSlide(2)" class="carousel-dot w-4 h-4 rounded-full transition-all bg-white/50 hover:bg-white/80 hover:scale-125"></button>
+            <button onclick="goToSlide(3)" class="carousel-dot w-4 h-4 rounded-full transition-all bg-white/50 hover:bg-white/80 hover:scale-125"></button>
         </div>
     </section>
+
+    <style>
+        @keyframes bounce-slow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-bounce-slow {
+            animation: bounce-slow 3s ease-in-out infinite;
+        }
+    </style>
 
     <!-- CV Upload Section -->
     <section class="py-8 bg-gradient-to-r from-blue-50 to-green-50">
