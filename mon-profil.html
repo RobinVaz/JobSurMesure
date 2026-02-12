@@ -187,9 +187,14 @@
                                     <p class="text-xs text-green-600" id="lmFileStatus">Uploadée le --/--/----</p>
                                 </div>
                             </div>
-                            <button class="p-2 text-red-500 hover:bg-red-100 rounded-lg">
-                                <i data-lucide="trash-2" class="w-5 h-5"></i>
-                            </button>
+                            <div class="flex gap-2">
+                                <button class="p-2 text-green-600 hover:bg-green-100 rounded-lg" onclick="previewLm()">
+                                    <i data-lucide="eye" class="w-5 h-5"></i>
+                                </button>
+                                <button class="p-2 text-red-500 hover:bg-red-100 rounded-lg">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
                         </div>
                         <label class="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-green-500 hover:bg-green-50 transition-colors">
                             <i data-lucide="upload" class="w-5 h-5 text-green-500"></i>
@@ -294,7 +299,7 @@
         </div>
     </footer>
 
-    <!-- CV Modal -->
+    <!-- CV/LM Modal -->
     <div id="cvModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 hidden">
         <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between p-4 border-b">
@@ -303,8 +308,8 @@
                         <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
                     </div>
                     <div>
-                        <h3 class="text-lg font-bold text-gray-900" id="cvModalTitle">Mon CV</h3>
-                        <p class="text-sm text-gray-500" id="cvModalFilename">Mon CV.pdf</p>
+                        <h3 class="text-lg font-bold text-gray-900" id="cvModalTitle">Document</h3>
+                        <p class="text-sm text-gray-500" id="cvModalFilename">fichier.pdf</p>
                     </div>
                 </div>
                 <button onclick="closeCvModal()" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">

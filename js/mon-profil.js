@@ -395,6 +395,30 @@ function closeCvModal() {
     document.getElementById('cvPreviewFrame').src = '';
 }
 
+// Preview LM
+function previewLm() {
+    const lmUrl = currentUser?.profile?.coverLetterUrl;
+    if (!lmUrl) {
+        alert('Veuillez d\'abord uploader votre lettre de motivation');
+        return;
+    }
+
+    // Update modal title and filename
+    const cvModalTitle = document.getElementById('cvModalTitle');
+    const cvModalFilename = document.getElementById('cvModalFilename');
+    const lmFileNameEl = document.getElementById('lmFileName');
+
+    if (cvModalTitle) {
+        cvModalTitle.textContent = `${currentUser.firstName} ${currentUser.lastName} - Lettre de motivation`;
+    }
+    if (cvModalFilename && lmFileNameEl) {
+        cvModalFilename.textContent = lmFileNameEl.textContent;
+    }
+
+    document.getElementById('cvPreviewFrame').src = lmUrl;
+    document.getElementById('cvModal').classList.remove('hidden');
+}
+
 // Save profile
 async function saveProfile() {
     if (!currentUser) {
