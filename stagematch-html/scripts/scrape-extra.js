@@ -20,7 +20,7 @@ const CONFIG = {
         baseUrl: 'https://www.etudiant.gouv.fr/fr/offre-de-stage',
         delay: 2000,
     },
-    young tangents: {
+    jeunesTangents: {
         baseUrl: 'https://www.jeunes-tangents.gouv.fr/offres-stage',
         delay: 2000,
     },
