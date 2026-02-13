@@ -338,6 +338,9 @@ function displayUserProfile(user) {
     const cvFileStatusEl = document.getElementById('cvFileStatus');
     const cvFileContainer = document.getElementById('cvFileContainer');
     const cvPlaceholder = document.getElementById('cvPlaceholder');
+    const cvFileSizeEl = document.getElementById('cvFileSize');
+    const cvSkillsInfo = document.getElementById('cvSkillsInfo');
+    const cvSkillsList = document.getElementById('cvSkillsList');
 
     if (user.profile?.cvUrl) {
         if (cvFileNameEl) cvFileNameEl.textContent = user.profile.cvName || 'CV_uploadé.pdf';
@@ -348,6 +351,9 @@ function displayUserProfile(user) {
         }
         if (cvFileContainer) cvFileContainer.classList.remove('hidden');
         if (cvPlaceholder) cvPlaceholder.classList.add('hidden');
+        if (cvFileSizeEl) cvFileSizeEl.textContent = 'Fichier chargé';
+        if (cvSkillsInfo) cvSkillsInfo.classList.add('hidden');
+        if (cvSkillsList) cvSkillsList.innerHTML = '';
     }
 
     const lmFileNameEl = document.getElementById('lmFileName');
@@ -501,6 +507,9 @@ function deleteCv() {
         const cvFileStatusEl = document.getElementById('cvFileStatus');
         const cvFileContainer = document.getElementById('cvFileContainer');
         const cvPlaceholder = document.getElementById('cvPlaceholder');
+        const cvSkillsInfo = document.getElementById('cvSkillsInfo');
+        const cvUploadText = document.getElementById('cvUploadText');
+        const cvUploadIcon = document.getElementById('cvUploadIconContainer');
 
         if (cvFileNameEl) cvFileNameEl.textContent = 'Mon CV.pdf';
         if (cvFileStatusEl) {
@@ -510,6 +519,18 @@ function deleteCv() {
         }
         if (cvFileContainer) cvFileContainer.classList.add('hidden');
         if (cvPlaceholder) cvPlaceholder.classList.remove('hidden');
+        if (cvSkillsInfo) cvSkillsInfo.classList.add('hidden');
+
+        // Reset upload zone
+        if (cvUploadText) {
+            cvUploadText.innerHTML = '<p class="text-lg font-semibold text-gray-700 mb-1">Glissez-déposez votre CV</p><p class="text-sm text-gray-500">ou cliquez pour parcourir (PDF, DOC)</p>';
+        }
+        if (cvUploadIcon) {
+            cvUploadIcon.innerHTML = '<i data-lucide="upload" class="w-8 h-8 text-blue-500"></i>';
+            setTimeout(() => lucide.createIcons(), 10);
+        }
+
+        Modal.info('Supprimé', 'Votre CV a été supprimé');
     }
 }
 
@@ -623,25 +644,70 @@ async function saveProfile() {
     }
 }
 
-// Upload CV file
-async function uploadCv(event) {
-    const file = event.target.files[0];
+// Upload CV file with drag & drop support and real-time preview
+async function uploadCv(file = null) {
+    // Handle file from drag & drop or file input
+    if (!file) {
+        const input = document.getElementById('cvFileInput');
+        if (input && input.files && input.files[0]) {
+            file = input.files[0];
+        } else {
+            return;
+        }
+    }
+
     if (!file) return;
+
+    // Validate file type
+    const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    if (!validTypes.includes(file.type) && !file.name.toLowerCase().match(/\.(pdf|doc|docx)$/)) {
+        Modal.error('Erreur', 'Veuillez upload un fichier PDF, DOC ou DOCX');
+        return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+        Modal.error('Erreur', 'Le fichier est trop volumineux (max 5MB)');
+        return;
+    }
 
     // Load current user if not available
     if (!currentUser) {
         currentUser = getCurrentUser();
     }
 
-    if (currentUser) {
+    if (!currentUser) {
+        Modal.error('Erreur', 'Veuillez vous connecter');
+        window.location.href = 'connexion.html';
+        return;
+    }
+
+    // UI: Show loading state
+    showCvLoadingState(true);
+
+    // Create preview URL for immediate feedback
+    const fileUrl = URL.createObjectURL(file);
+
+    try {
         // Use FileReader to read as DataURL for proper base64 encoding
         const reader = new FileReader();
+
+        // Progress tracking
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+            progress = Math.min(progress + 10, 90);
+            updateCvProgressBar(progress);
+        }, 100);
+
         reader.onload = function(e) {
+            clearInterval(progressInterval);
+            updateCvProgressBar(100);
+
             const fileContent = e.target.result;
 
             console.log('File read successfully, size:', fileContent.length);
 
-            // Analyze CV text for skills extraction (only for text files or simple PDF preview)
+            // Analyze CV text for skills extraction
             let newSkills = [];
             let analysis = {};
 
@@ -683,26 +749,11 @@ async function uploadCv(event) {
                 console.log('User saved to localStorage:', currentUser.email);
                 console.log('Files saved:', Object.keys(savedFiles));
 
-                // Update UI
-                const cvFileNameEl = document.getElementById('cvFileName');
-                const cvFileStatusEl = document.getElementById('cvFileStatus');
-                const cvFileContainer = document.getElementById('cvFileContainer');
-                const cvPlaceholder = document.getElementById('cvPlaceholder');
+                // Update UI with file info
+                updateCvUploadedUI(file, fileContent, newSkills, combinedSkills || []);
 
-                if (cvFileNameEl) {
-                    cvFileNameEl.textContent = file.name;
-                }
-                if (cvFileStatusEl) {
-                    cvFileStatusEl.classList.remove('text-gray-500', 'text-blue-600');
-                    cvFileStatusEl.classList.add('text-green-600');
-                    cvFileStatusEl.textContent = 'Uploadé le ' + new Date().toLocaleDateString('fr-FR') + ' - ' + newSkills.length + ' compétences détectées';
-                }
-                if (cvFileContainer) {
-                    cvFileContainer.classList.remove('hidden');
-                }
-                if (cvPlaceholder) {
-                    cvPlaceholder.classList.add('hidden');
-                }
+                // Show success feedback
+                Modal.success('Succès', `CV "${file.name}" uploadé avec succès !`);
 
                 // Update skills input field if it exists
                 const skillsInput = document.getElementById('skillsInput');
@@ -717,14 +768,119 @@ async function uploadCv(event) {
                 if (typeof searchJobs === 'function') {
                     setTimeout(() => searchJobs(), 500);
                 }
+
+                // Close loading state after delay
+                setTimeout(() => showCvLoadingState(false), 1500);
             };
             textReader.readAsText(file);
         };
+
+        reader.onerror = function() {
+            clearInterval(progressInterval);
+            showCvLoadingState(false);
+            Modal.error('Erreur', 'Impossible de lire le fichier');
+        };
+
         reader.readAsDataURL(file);
-    } else {
-        Modal.error('Erreur', 'Veuillez vous connecter pour uploader votre CV');
-        window.location.href = 'connexion.html';
+    } catch (err) {
+        clearInterval(progressInterval);
+        showCvLoadingState(false);
+        console.error('Upload error:', err);
+        Modal.error('Erreur', 'Une erreur est survenue lors de l\'upload');
     }
+}
+
+// Show loading state for CV upload
+function showCvLoadingState(show) {
+    const uploadZone = document.getElementById('cvUploadZone');
+    const uploadIcon = document.getElementById('cvUploadIconContainer');
+    const uploadText = document.getElementById('cvUploadText');
+    const loadingState = document.getElementById('cvLoadingState');
+
+    if (uploadZone && uploadIcon && uploadText && loadingState) {
+        if (show) {
+            uploadIcon.innerHTML = '<i data-lucide="loader" class="w-8 h-8 text-blue-500 animate-spin"></i>';
+            uploadText.innerHTML = '<p class="text-lg font-semibold text-gray-700 mb-1">Analyse en cours...</p>';
+            loadingState.classList.remove('hidden');
+        } else {
+            uploadIcon.innerHTML = '<i data-lucide="upload" class="w-8 h-8 text-blue-500"></i>';
+            uploadText.innerHTML = '<p class="text-lg font-semibold text-gray-700 mb-1">Glissez-déposez votre CV</p><p class="text-sm text-gray-500">ou cliquez pour parcourir (PDF, DOC)</p>';
+            loadingState.classList.add('hidden');
+            setTimeout(() => {
+                if (!document.getElementById('cvFileContainer')?.classList.contains('hidden')) {
+                    uploadIcon.innerHTML = '<i data-lucide="check" class="w-8 h-8 text-green-500"></i>';
+                    uploadText.innerHTML = '<p class="text-lg font-semibold text-green-700">CV uploadé !</p>';
+                }
+            }, 1500);
+        }
+        setTimeout(() => lucide.createIcons(), 10);
+    }
+}
+
+// Update CV progress bar
+function updateCvProgressBar(percent) {
+    const progressBar = document.getElementById('cvProgressBar');
+    const progressBarContainer = document.getElementById('cvProgressBarContainer');
+    if (progressBar && progressBarContainer) {
+        progressBar.style.width = percent + '%';
+        if (percent > 0) progressBarContainer.classList.remove('hidden');
+        if (percent >= 100) {
+            setTimeout(() => progressBarContainer.classList.add('hidden'), 1000);
+        }
+    }
+}
+
+// Update UI after CV is uploaded
+function updateCvUploadedUI(file, fileContent, skills, combinedSkills) {
+    // Show uploaded container
+    const cvFileContainer = document.getElementById('cvFileContainer');
+    const cvFileNameEl = document.getElementById('cvFileName');
+    const cvFileSizeEl = document.getElementById('cvFileSize');
+    const cvFileStatusEl = document.getElementById('cvFileStatus');
+    const cvPlaceholder = document.getElementById('cvPlaceholder');
+    const cvSkillsInfo = document.getElementById('cvSkillsInfo');
+    const cvSkillsList = document.getElementById('cvSkillsList');
+
+    if (cvFileContainer) cvFileContainer.classList.remove('hidden');
+    if (cvPlaceholder) cvPlaceholder.classList.add('hidden');
+
+    if (cvFileNameEl) cvFileNameEl.textContent = file.name;
+
+    // Format file size
+    let fileSizeStr = (file.size / 1024).toFixed(1) + ' KB';
+    if (file.size > 1024 * 1024) {
+        fileSizeStr = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+    if (cvFileSizeEl) cvFileSizeEl.textContent = fileSizeStr;
+
+    if (cvFileStatusEl) {
+        cvFileStatusEl.classList.remove('text-gray-500');
+        cvFileStatusEl.classList.add('text-green-600');
+        cvFileStatusEl.textContent = 'Uploadé le ' + new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' - ' + skills.length + ' compétences détectées';
+    }
+
+    // Show skills info
+    if (cvSkillsInfo && cvSkillsList) {
+        if (skills.length > 0) {
+            cvSkillsInfo.classList.remove('hidden');
+            cvSkillsList.innerHTML = skills.map(skill =>
+                `<span class="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium border border-blue-200">#${skill}</span>`
+            ).join('');
+        } else {
+            cvSkillsInfo.classList.add('hidden');
+        }
+    }
+
+    // Reset upload zone text after delay
+    setTimeout(() => {
+        const uploadText = document.getElementById('cvUploadText');
+        const uploadIcon = document.getElementById('cvUploadIconContainer');
+        if (uploadText && uploadIcon) {
+            uploadText.innerHTML = '<p class="text-lg font-semibold text-gray-700 mb-1">Glissez-déposez un nouveau CV</p><p class="text-sm text-gray-500">pour le remplacer</p>';
+            uploadIcon.innerHTML = '<i data-lucide="upload" class="w-8 h-8 text-blue-500"></i>';
+            setTimeout(() => lucide.createIcons(), 10);
+        }
+    }, 1000);
 }
 
 // Upload LM file
@@ -830,4 +986,56 @@ document.addEventListener('DOMContentLoaded', function() {
     lucide.createIcons();
     initMobileMenu();
     loadUserProfile();
+    initDragAndDrop();
 });
+
+// Initialize Drag & Drop for CV
+function initDragAndDrop() {
+    const uploadZone = document.getElementById('cvUploadZone');
+    const uploadText = document.getElementById('cvUploadText');
+
+    if (!uploadZone) return;
+
+    // Prevent default drag behaviors
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+    });
+
+    // Highlight on drag enter/over
+    ['dragenter', 'dragover'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, () => {
+            uploadZone.classList.add('border-blue-500', 'bg-blue-50/30');
+            if (uploadText) {
+                uploadText.innerHTML = '<p class="text-lg font-semibold text-blue-700 mb-1">Relâchez pour upload</p>';
+            }
+        });
+    });
+
+    // Remove highlight on drag leave
+    ['dragleave', 'drop'].forEach(eventName => {
+        uploadZone.addEventListener(eventName, () => {
+            uploadZone.classList.remove('border-blue-500', 'bg-blue-50/30');
+            if (uploadText) {
+                uploadText.innerHTML = '<p class="text-lg font-semibold text-gray-700 mb-1">Glissez-déposez votre CV</p><p class="text-sm text-gray-500">ou cliquez pour parcourir (PDF, DOC)</p>';
+            }
+        });
+    });
+
+    // Handle drop
+    uploadZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer?.files;
+        if (files && files[0]) {
+            const file = files[0];
+            // Validate file type
+            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (validTypes.includes(file.type) || file.name.toLowerCase().match(/\.(pdf|doc|docx)$/)) {
+                uploadCv(file);
+            } else {
+                Modal.error('Erreur', 'Format de fichier non supporté. Utilisez PDF, DOC ou DOCX');
+            }
+        }
+    });
+}
