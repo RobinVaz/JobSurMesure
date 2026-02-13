@@ -987,6 +987,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initMobileMenu();
     loadUserProfile();
     initDragAndDrop();
+    initCvEditor();
 });
 
 // Initialize Drag & Drop for CV
@@ -1038,4 +1039,220 @@ function initDragAndDrop() {
             }
         }
     });
+}
+
+// ==================== CV Editor Functions ====================
+
+// Toggle CV Editor
+function toggleCvEditor() {
+    const previewSection = document.getElementById('cvPreviewSection');
+    const editorSection = document.getElementById('cvEditorSection');
+    const toggleBtn = document.getElementById('toggleCvEditorBtn');
+
+    if (previewSection && editorSection && toggleBtn) {
+        if (previewSection.classList.contains('hidden')) {
+            // Switch to preview
+            previewSection.classList.remove('hidden');
+            editorSection.classList.add('hidden');
+            toggleBtn.innerHTML = '<i data-lucide="pen-line" class="w-4 h-4"></i> Éditer en ligne';
+            setTimeout(() => lucide.createIcons(), 10);
+        } else {
+            // Switch to editor
+            previewSection.classList.add('hidden');
+            editorSection.classList.remove('hidden');
+            loadCvEditorData();
+            toggleBtn.innerHTML = '<i data-lucide="eye" class="w-4 h-4"></i> Voir le CV';
+            setTimeout(() => lucide.createIcons(), 10);
+        }
+    }
+}
+
+// Load current user data into editor
+function loadCvEditorData() {
+    if (!currentUser) return;
+
+    // Basic info
+    const editorFirstName = document.getElementById('editorFirstName');
+    const editorLastName = document.getElementById('editorLastName');
+    const editorBio = document.getElementById('editorBio');
+    const editorSkills = document.getElementById('editorSkills');
+
+    if (editorFirstName) editorFirstName.value = currentUser.firstName || '';
+    if (editorLastName) editorLastName.value = currentUser.lastName || '';
+    if (editorBio) editorBio.value = currentUser.profile?.bio || '';
+    if (editorSkills) editorSkills.value = Array.isArray(currentUser.profile?.skills) ?
+        currentUser.profile.skills.join(', ') : '';
+
+    // Load experiences
+    loadExperiences(currentUser.profile?.experiences || []);
+
+    // Load education
+    loadEducations(currentUser.profile?.education || []);
+}
+
+// Load experiences into editor
+function loadExperiences(experiences) {
+    const list = document.getElementById('experienceList');
+    if (!list) return;
+
+    if (!experiences || !Array.isArray(experiences) || experiences.length === 0) {
+        list.innerHTML = '<p class="text-sm text-blue-600 italic">Aucune expérience ajoutée</p>';
+        return;
+    }
+
+    list.innerHTML = experiences.map((exp, index) => `
+        <div class="bg-white p-4 rounded-lg border border-blue-200 shadow-sm" data-index="${index}">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                    <input type="text" class="w-full font-semibold text-blue-900 mb-2 px-2 py-1 rounded border border-blue-200 focus:border-blue-500 outline-none"
+                           placeholder="Poste" value="${exp.position || ''}">
+                    <div class="flex gap-2">
+                        <input type="text" class="flex-1 text-sm px-2 py-1 rounded border border-blue-200 focus:border-blue-500 outline-none"
+                               placeholder="Entreprise" value="${exp.company || ''}">
+                        <input type="text" class="w-32 text-sm px-2 py-1 rounded border border-blue-200 focus:border-blue-500 outline-none"
+                               placeholder="Date" value="${exp.date || ''}">
+                    </div>
+                </div>
+                <button class="text-red-500 hover:bg-red-50 p-2 rounded-lg" onclick="removeExperience(${index})">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <textarea class="w-full text-sm px-2 py-1 rounded border border-blue-200 focus:border-blue-500 outline-none resize-none"
+                      rows="3" placeholder="Détails de la mission...">${exp.description || ''}</textarea>
+        </div>
+    `).join('');
+    setTimeout(() => lucide.createIcons(), 10);
+}
+
+// Add new experience
+window.addExperience = function() {
+    if (!currentUser) return;
+    const experiences = currentUser.profile?.experiences || [];
+    experiences.push({
+        position: '',
+        company: '',
+        date: '',
+        description: ''
+    });
+    currentUser.profile.experiences = experiences;
+    loadExperiences(experiences);
+    saveCvEditorDataToProfile();
+};
+
+// Remove experience
+window.removeExperience = function(index) {
+    if (!currentUser) return;
+    const experiences = currentUser.profile?.experiences || [];
+    if (index >= 0 && index < experiences.length) {
+        experiences.splice(index, 1);
+        currentUser.profile.experiences = experiences;
+        loadExperiences(experiences);
+        saveCvEditorDataToProfile();
+    }
+};
+
+// Load educations into editor
+function loadEducations(educations) {
+    const list = document.getElementById('educationList');
+    if (!list) return;
+
+    if (!educations || !Array.isArray(educations) || educations.length === 0) {
+        list.innerHTML = '<p class="text-sm text-blue-600 italic">Aucune formation ajoutée</p>';
+        return;
+    }
+
+    list.innerHTML = educations.map((edu, index) => `
+        <div class="bg-white p-4 rounded-lg border border-blue-200 shadow-sm" data-index="${index}">
+            <div class="flex items-start justify-between mb-3">
+                <div class="flex-1">
+                    <input type="text" class="w-full font-semibold text-blue-900 mb-2 px-2 py-1 rounded border border-blue-200 focus:border-blue-500 outline-none"
+                           placeholder="Diplôme" value="${edu.degree || ''}">
+                    <div class="flex gap-2">
+                        <input type="text" class="flex-1 text-sm px-2 py-1 rounded border border-blue-200 focus:border-blue-500 outline-none"
+                               placeholder="Établissement" value="${edu.school || ''}">
+                        <input type="text" class="w-32 text-sm px-2 py-1 rounded border border-blue-200 focus:border-blue-500 outline-none"
+                               placeholder="Date" value="${edu.date || ''}">
+                    </div>
+                </div>
+                <button class="text-red-500 hover:bg-red-50 p-2 rounded-lg" onclick="removeEducation(${index})">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+    setTimeout(() => lucide.createIcons(), 10);
+}
+
+// Add new education
+window.addEducation = function() {
+    if (!currentUser) return;
+    const educations = currentUser.profile?.education || [];
+    educations.push({
+        degree: '',
+        school: '',
+        date: ''
+    });
+    currentUser.profile.education = educations;
+    loadEducations(educations);
+    saveCvEditorDataToProfile();
+};
+
+// Remove education
+window.removeEducation = function(index) {
+    if (!currentUser) return;
+    const educations = currentUser.profile?.education || [];
+    if (index >= 0 && index < educations.length) {
+        educations.splice(index, 1);
+        currentUser.profile.education = educations;
+        loadEducations(educations);
+        saveCvEditorDataToProfile();
+    }
+};
+
+// Save editor data to user profile
+function saveCvEditorDataToProfile() {
+    if (!currentUser) return;
+
+    const editorFirstName = document.getElementById('editorFirstName');
+    const editorLastName = document.getElementById('editorLastName');
+    const editorBio = document.getElementById('editorBio');
+    const editorSkills = document.getElementById('editorSkills');
+
+    if (editorFirstName) currentUser.firstName = editorFirstName.value.trim();
+    if (editorLastName) currentUser.lastName = editorLastName.value.trim();
+    if (editorBio) currentUser.profile.bio = editorBio.value.trim();
+    if (editorSkills) {
+        currentUser.profile.skills = editorSkills.value.split(',')
+            .map(s => s.trim())
+            .filter(s => s.length > 0);
+    }
+
+    localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
+}
+
+// Reset editor
+function resetCvEditor() {
+    loadCvEditorData();
+}
+
+// Save editor and go back to preview
+function saveCvEditor() {
+    saveCvEditorDataToProfile();
+    Modal.success('Succès', 'Vos modifications ont été sauvegardées !');
+    toggleCvEditor();
+}
+
+// Initialize CV Editor
+function initCvEditor() {
+    const toggleBtn = document.getElementById('toggleCvEditorBtn');
+    const resetBtn = document.getElementById('resetCvEditorBtn');
+    const saveBtn = document.getElementById('saveCvEditorBtn');
+    const addExpBtn = document.getElementById('addExperienceBtn');
+    const addEduBtn = document.getElementById('addEducationBtn');
+
+    if (toggleBtn) toggleBtn.addEventListener('click', toggleCvEditor);
+    if (resetBtn) resetBtn.addEventListener('click', resetCvEditor);
+    if (saveBtn) saveBtn.addEventListener('click', saveCvEditor);
+    if (addExpBtn) addExpBtn.addEventListener('click', addExperience);
+    if (addEduBtn) addEduBtn.addEventListener('click', addEducation);
 }
