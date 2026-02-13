@@ -12,6 +12,7 @@ function setSource(source) {
         'indeed': 'border-blue-500 bg-blue-50',
         'welcome_to_the_jungle': 'border-green-500 bg-green-50',
         'linkedin': 'border-blue-700 bg-blue-700/10',
+        'twitter': 'border-black bg-gray-100',
         'jobteaser': 'border-pink-500 bg-pink-50',
         'all': 'border-purple-500 bg-purple-50',
         'all_sources': 'border-emerald-600 bg-emerald-50'
@@ -31,12 +32,22 @@ function setSource(source) {
         'indeed': 'Indeed',
         'welcome_to_the_jungle': 'WTTJ',
         'linkedin': 'LinkedIn',
+        'twitter': 'X (Twitter)',
         'jobteaser': 'JobTeaser',
         'all': 'HelloWork + Indeed',
         'all_sources': 'Toutes les sources (5)'
     };
 
     document.getElementById('scrapeBtnText').textContent = 'Scraping ' + (labels[source] || source);
+
+    // Redirection for LinkedIn emoticon
+    if (source === 'linkedin') {
+        window.open('https://www.linkedin.com/feed/?skipRedirect=true', '_blank');
+    }
+    // Redirection for X (Twitter) emoticon
+    if (source === 'twitter') {
+        window.open('https://x.com/Jobsurmesure', '_blank');
+    }
 }
 
 // Quick scrape function
