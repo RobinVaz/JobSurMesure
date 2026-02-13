@@ -1083,6 +1083,30 @@ function loadCvEditorData() {
     if (editorSkills) editorSkills.value = Array.isArray(currentUser.profile?.skills) ?
         currentUser.profile.skills.join(', ') : '';
 
+    // Load CV Markdown content if exists
+    const cvEditorMarkdown = document.getElementById('cvEditorMarkdown');
+    if (cvEditorMarkdown && window.simpleMDE) {
+        const cvMarkdown = currentUser.profile?.cvMarkdown || '';
+        if (cvMarkdown) {
+            window.simpleMDE.value(cvMarkdown);
+        } else {
+            // Generate default CV from user data
+            let defaultContent = `# CV de ${currentUser.firstName} ${currentUser.lastName}\n\n`;
+            if (currentUser.profile?.bio) {
+                defaultContent += `${currentUser.profile.bio}\n\n`;
+            }
+            defaultContent += `## Expériences\n\n> Aucune expérience ajoutée.\n\n`;
+            defaultContent += `## Formations\n\n> Aucune formation ajoutée.\n\n`;
+            defaultContent += `## Compétences\n\n`;
+            if (currentUser.profile?.skills && currentUser.profile.skills.length > 0) {
+                currentUser.profile.skills.forEach(skill => {
+                    defaultContent += `- ${skill}\n`;
+                });
+            }
+            window.simpleMDE.value(defaultContent);
+        }
+    }
+
     // Load experiences
     loadExperiences(currentUser.profile?.experiences || []);
 
@@ -1233,11 +1257,24 @@ function saveCvEditorDataToProfile() {
 // Reset editor
 function resetCvEditor() {
     loadCvEditorData();
+    // Reset SimpleMDE to original value
+    const cvEditorMarkdown = document.getElementById('cvEditorMarkdown');
+    if (cvEditorMarkdown && window.simpleMDE) {
+        window.simpleMDE.value(currentUser.profile?.cvMarkdown || '');
+    }
 }
 
 // Save editor and go back to preview
 function saveCvEditor() {
     saveCvEditorDataToProfile();
+
+    // Save Markdown content
+    const cvEditorMarkdown = document.getElementById('cvEditorMarkdown');
+    if (cvEditorMarkdown && window.simpleMDE && currentUser) {
+        currentUser.profile.cvMarkdown = window.simpleMDE.value();
+    }
+
+    localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
     Modal.success('Succès', 'Vos modifications ont été sauvegardées !');
     toggleCvEditor();
 }
@@ -1255,4 +1292,106 @@ function initCvEditor() {
     if (saveBtn) saveBtn.addEventListener('click', saveCvEditor);
     if (addExpBtn) addExpBtn.addEventListener('click', addExperience);
     if (addEduBtn) addEduBtn.addEventListener('click', addEducation);
+
+    // Initialize SimpleMDE Markdown Editor
+    const cvEditorMarkdown = document.getElementById('cvEditorMarkdown');
+    if (cvEditorMarkdown) {
+        window.simpleMDE = new SimpleMDE({
+            element: cvEditorMarkdown,
+            autosave: {
+                enabled: true,
+                unique_id: 'cv_editor',
+                delay: 1000,
+            },
+            toolbar: [
+                {
+                    name: 'bold',
+                    action: SimpleMDE.toggleBold,
+                    className: 'fa fa-bold',
+                    title: 'Gras (Ctrl+B)',
+                },
+                {
+                    name: 'italic',
+                    action: SimpleMDE.toggleItalic,
+                    className: 'fa fa-italic',
+                    title: 'Italique (Ctrl+I)',
+                },
+                {
+                    name: 'strikethrough',
+                    action: SimpleMDE.toggleStrikethrough,
+                    className: 'fa fa-strikethrough',
+                    title: 'Barré',
+                },
+                {
+                    name: 'heading',
+                    action: SimpleMDE.toggleHeadingSmaller,
+                    className: 'fa fa-header',
+                    title: 'Titre',
+                },
+                '|',
+                {
+                    name: 'list',
+                    action: SimpleMDE.toggleUnorderedList,
+                    className: 'fa fa-list-ul',
+                    title: 'Liste',
+                },
+                {
+                    name: 'ordered-list',
+                    action: SimpleMDE.toggleOrderedList,
+                    className: 'fa fa-list-ol',
+                    title: 'Liste numérotée',
+                },
+                '|',
+                {
+                    name: 'link',
+                    action: SimpleMDE.drawLink,
+                    className: 'fa fa-link',
+                    title: 'Lien',
+                },
+                {
+                    name: 'image',
+                    action: SimpleMDE.drawImage,
+                    className: 'fa fa-image',
+                    title: 'Image',
+                },
+                '|',
+                {
+                    name: 'preview',
+                    action: SimpleMDE.togglePreview,
+                    className: 'fa fa-eye no-disable',
+                    title: 'Aperçu',
+                },
+                {
+                    name: 'side-by-side',
+                    action: SimpleMDE.toggleSideBySide,
+                    className: 'fa fa-columns no-disable no-mobile',
+                    title: 'Side by side',
+                },
+                {
+                    name: 'fullscreen',
+                    action: SimpleMDE.toggleFullScreen,
+                    className: 'fa fa-arrows-alt no-disable no-mobile',
+                    title: 'Plein écran',
+                },
+            ],
+            promptURLs: false,
+            renderingConfig: {
+                singleLineBreaks: false,
+                codeSyntaxHighlighting: true,
+            },
+            placeholder: 'Écrivez votre CV ici en utilisant la syntaxe Markdown...\n\n# Titre principal\n\n## Expériences\n\n## Formations\n\n## Compétences',
+            status: ['lines', 'words', 'cursor'],
+        });
+
+        // Add event listener for changes
+        if (window.simpleMDE && window.simpleMDE.codemirror) {
+            window.simpleMDE.codemirror.on('change', function() {
+                // Auto-save on change
+                if (currentUser) {
+                    currentUser.profile.cvMarkdown = window.simpleMDE.value();
+                    localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
+                }
+            });
+        }
+    }
 }
