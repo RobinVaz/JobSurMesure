@@ -1168,6 +1168,43 @@ function previewCv() {
     document.getElementById('cvModal').classList.remove('hidden');
 }
 
+// Preview LM
+function previewLm() {
+    if (!currentUser) {
+        Modal.error('Erreur', 'Veuillez vous connecter');
+        return;
+    }
+
+    const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+    const lmFileKey = `lm_${currentUser.id}`;
+    const lmFile = savedFiles[lmFileKey];
+
+    if (!lmFile || !lmFile.url) {
+        Modal.error('Erreur', 'Aucune lettre de motivation trouvée');
+        return;
+    }
+
+    // Display in modal
+    const cvModalTitle = document.getElementById('cvModalTitle');
+    const cvModalFilename = document.getElementById('cvModalFilename');
+
+    if (cvModalTitle) {
+        cvModalTitle.textContent = `Lettre de motivation`;
+    }
+    if (cvModalFilename) {
+        cvModalFilename.textContent = lmFile.name;
+    }
+
+    // Check if it's a Word document
+    if (lmFile.name.toLowerCase().endsWith('.doc') || lmFile.name.toLowerCase().endsWith('.docx')) {
+        const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(lmFile.url)}`;
+        document.getElementById('cvPreviewFrame').src = viewerUrl;
+    } else {
+        document.getElementById('cvPreviewFrame').src = lmFile.url;
+    }
+    document.getElementById('cvModal').classList.remove('hidden');
+}
+
 // Show AI CV generation modal
 function showAICVModal() {
     if (!currentUser) {
