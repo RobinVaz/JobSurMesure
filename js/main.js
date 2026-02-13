@@ -855,15 +855,41 @@ function initUploads() {
     const cvFileInput = document.getElementById('cvFileInput');
     const lmFileInput = document.getElementById('lmFileInput');
 
+    // Get current user for file keys
+    let currentUser = null;
+    const storedUser = localStorage.getItem('jobsurmesure_user');
+    if (storedUser) {
+        currentUser = JSON.parse(storedUser);
+        currentUser.cvFileKey = `cv_${currentUser.id}`;
+        currentUser.lmFileKey = `lm_${currentUser.id}`;
+    }
+
     if (cvFileInput) {
         cvFileInput.addEventListener('change', function(e) {
             if (e.target.files && e.target.files[0]) {
                 const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    const base64 = e.target.result;
-                    // In a real app, this would be saved to backend
-                    // For demo, we show success message
+                    const fileContent = e.target.result;
+
+                    // Save to localStorage for persistence across pages
+                    if (currentUser) {
+                        const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+                        savedFiles[currentUser.cvFileKey] = {
+                            url: fileContent,
+                            name: file.name,
+                            type: 'cv',
+                            timestamp: new Date().toISOString()
+                        };
+                        localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
+
+                        // Update user profile with CV info
+                        currentUser.profile = currentUser.profile || {};
+                        currentUser.profile.cvUrl = fileContent;
+                        currentUser.profile.cvName = file.name;
+                        localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
+                    }
+
                     Modal.success('Succès', `CV "${file.name}" uploadé avec succès !`);
                 };
                 reader.readAsDataURL(file);
@@ -877,6 +903,26 @@ function initUploads() {
                 const file = e.target.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    const fileContent = e.target.result;
+
+                    // Save to localStorage for persistence across pages
+                    if (currentUser) {
+                        const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+                        savedFiles[currentUser.lmFileKey] = {
+                            url: fileContent,
+                            name: file.name,
+                            type: 'lm',
+                            timestamp: new Date().toISOString()
+                        };
+                        localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
+
+                        // Update user profile with LM info
+                        currentUser.profile = currentUser.profile || {};
+                        currentUser.profile.coverLetterUrl = fileContent;
+                        currentUser.profile.lmName = file.name;
+                        localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
+                    }
+
                     Modal.success('Succès', `Lettre de motivation "${file.name}" uploadée avec succès !`);
                 };
                 reader.readAsDataURL(file);
@@ -954,17 +1000,60 @@ function updateUploadContent() {
     const lmUploadContent = document.getElementById('lmUploadContent');
 
     if (currentUser) {
-        cvUploadContent.innerHTML = `<label class="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
-            <i data-lucide="upload" class="w-5 h-5 text-blue-500"></i>
-            <span class="text-blue-600 font-medium">Télécharger mon CV</span>
-            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="cvFileInput">
-        </label>`;
+        // Check if CV is already uploaded
+        const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+        const cvFileKey = `cv_${currentUser.id}`;
+        const hasCv = savedFiles[cvFileKey] && savedFiles[cvFileKey].url;
 
-        lmUploadContent.innerHTML = `<label class="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-green-300 rounded-xl cursor-pointer hover:border-green-500 hover:bg-green-50 transition-colors">
-            <i data-lucide="upload" class="w-5 h-5 text-green-500"></i>
-            <span class="text-green-600 font-medium">Télécharger ma LM</span>
-            <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="lmFileInput">
-        </label>`;
+        if (hasCv) {
+            cvUploadContent.innerHTML = `<div class="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="file-text" class="w-5 h-5 text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-green-800">${savedFiles[cvFileKey].name}</p>
+                        <p class="text-xs text-green-600">Uploadé le ${new Date(savedFiles[cvFileKey].timestamp).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                </div>
+                <button onclick="deleteCvFromUploadSection()" class="p-2 text-red-500 hover:bg-red-100 rounded-lg" title="Supprimer">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+            </div>`;
+        } else {
+            cvUploadContent.innerHTML = `<label class="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-colors">
+                <i data-lucide="upload" class="w-5 h-5 text-blue-500"></i>
+                <span class="text-blue-600 font-medium">Télécharger mon CV</span>
+                <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="cvFileInput">
+            </label>`;
+        }
+
+        // Check if LM is already uploaded
+        const lmFileKey = `lm_${currentUser.id}`;
+        const hasLm = savedFiles[lmFileKey] && savedFiles[lmFileKey].url;
+
+        if (hasLm) {
+            lmUploadContent.innerHTML = `<div class="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i data-lucide="file-text" class="w-5 h-5 text-green-600"></i>
+                    </div>
+                    <div>
+                        <p class="font-medium text-green-800">${savedFiles[lmFileKey].name}</p>
+                        <p class="text-xs text-green-600">Uploadée le ${new Date(savedFiles[lmFileKey].timestamp).toLocaleDateString('fr-FR')}</p>
+                    </div>
+                </div>
+                <button onclick="deleteLmFromUploadSection()" class="p-2 text-red-500 hover:bg-red-100 rounded-lg" title="Supprimer">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
+            </div>`;
+        } else {
+            lmUploadContent.innerHTML = `<label class="flex items-center justify-center gap-2 w-full py-3 px-4 border-2 border-dashed border-green-300 rounded-xl cursor-pointer hover:border-green-500 hover:bg-green-50 transition-colors">
+                <i data-lucide="upload" class="w-5 h-5 text-green-500"></i>
+                <span class="text-green-600 font-medium">Télécharger ma LM</span>
+                <input type="file" accept=".pdf,.doc,.docx" class="hidden" id="lmFileInput">
+            </label>`;
+        }
 
         setTimeout(() => lucide.createIcons(), 10);
     } else {
@@ -980,6 +1069,54 @@ function updateUploadContent() {
     }
 }
 
+// Delete CV from upload section
+function deleteCvFromUploadSection() {
+    if (!currentUser) return;
+
+    const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+    const cvFileKey = `cv_${currentUser.id}`;
+
+    if (savedFiles[cvFileKey]) {
+        delete savedFiles[cvFileKey];
+        localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
+
+        // Update user profile
+        if (currentUser.profile) {
+            delete currentUser.profile.cvUrl;
+            delete currentUser.profile.cvName;
+        }
+        localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
+
+        // Refresh upload content
+        updateUploadContent();
+        Modal.info('Info', 'CV supprimé');
+    }
+}
+
+// Delete LM from upload section
+function deleteLmFromUploadSection() {
+    if (!currentUser) return;
+
+    const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+    const lmFileKey = `lm_${currentUser.id}`;
+
+    if (savedFiles[lmFileKey]) {
+        delete savedFiles[lmFileKey];
+        localStorage.setItem('jobsurmesure_files', JSON.stringify(savedFiles));
+
+        // Update user profile
+        if (currentUser.profile) {
+            delete currentUser.profile.coverLetterUrl;
+            delete currentUser.profile.lmName;
+        }
+        localStorage.setItem('jobsurmesure_user', JSON.stringify(currentUser));
+
+        // Refresh upload content
+        updateUploadContent();
+        Modal.info('Info', 'Lettre de motivation supprimée');
+    }
+}
+
 function loadStats() {
     // Simulated stats
     document.getElementById('totalJobs').textContent = '1500+';
@@ -990,6 +1127,45 @@ function loadStats() {
 function closeCvModal() {
     document.getElementById('cvModal').classList.add('hidden');
     document.getElementById('cvPreviewFrame').src = '';
+}
+
+// Preview CV
+function previewCv() {
+    if (!currentUser) {
+        Modal.error('Erreur', 'Veuillez vous connecter');
+        return;
+    }
+
+    const savedFiles = JSON.parse(localStorage.getItem('jobsurmesure_files') || '{}');
+    const cvFileKey = `cv_${currentUser.id}`;
+    const cvFile = savedFiles[cvFileKey];
+
+    if (!cvFile || !cvFile.url) {
+        Modal.error('Erreur', 'Aucun CV trouvé');
+        return;
+    }
+
+    // Display in modal
+    const cvModalTitle = document.getElementById('cvModalTitle');
+    const cvModalFilename = document.getElementById('cvModalFilename');
+
+    if (cvModalTitle) {
+        cvModalTitle.textContent = `Mon CV`;
+    }
+    if (cvModalFilename) {
+        cvModalFilename.textContent = cvFile.name;
+    }
+
+    // Check if it's a Word document
+    if (cvFile.name.toLowerCase().endsWith('.doc') || cvFile.name.toLowerCase().endsWith('.docx')) {
+        // Use Microsoft Word Viewer for Word documents
+        const viewerUrl = `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(cvFile.url)}`;
+        document.getElementById('cvPreviewFrame').src = viewerUrl;
+    } else {
+        // For PDF, display directly
+        document.getElementById('cvPreviewFrame').src = cvFile.url;
+    }
+    document.getElementById('cvModal').classList.remove('hidden');
 }
 
 // Show AI CV generation modal
